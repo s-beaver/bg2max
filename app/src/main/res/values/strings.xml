@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">BG2MAX</string>
+    <string name="notification_channel_name">Трансляция глюкозы</string>
+    <string name="notification_text">BG2MAX активен и слушает xDrip+</string>
+</resources>
