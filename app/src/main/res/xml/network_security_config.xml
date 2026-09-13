@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Хост MAX Bot API (platform-api2.max.ru) использует сертификат, выпущенный
+    "Russian Trusted Root CA" (НУЦ Минцифры России). Этот корневой сертификат
+    отсутствует в системном хранилище доверия Android, из-за чего TLS-соединение
+    падает с CertPathValidatorException: Trust anchor for certification path not found.
+    Добавляем его как дополнительный доверенный якорь только для домена max.ru.
+-->
+<network-security-config>
+    <domain-config>
+        <domain includeSubdomains="true">max.ru</domain>
+        <trust-anchors>
+            <certificates src="@raw/russian_trusted_root_ca" />
+            <certificates src="system" />
+        </trust-anchors>
+    </domain-config>
+</network-security-config>

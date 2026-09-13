@@ -9,41 +9,27 @@ import java.net.URLEncoder
 /**
  * Минимальный клиент MAX Bot API.
  *
- * В открытых источниках встречаются два описания одного и того же API:
- *  - официальные Go/TS SDK от max-messenger: host platform-api2.max.ru,
- *    токен передаётся в заголовке Authorization;
- *  - опубликованная OpenAPI-схема: host botapi.max.ru,
- *    токен передаётся query-параметром access_token.
- * Пробуем первый вариант (он подтверждён двумя независимыми SDK), при неудаче — второй.
+ * Host: platform-api2.max.ru, токен передаётся в заголовке Authorization
+ * (без префикса Bearer). Передача токена через query-параметр access_token
+ * отключена платформой — старый host botapi.max.ru отвечает 401 на любой запрос.
  */
 object MaxApiClient {
 
     private const val TIMEOUT_MS = 15000
-
-    private data class Endpoint(val baseUrl: String, val useHeaderAuth: Boolean)
-
-    private val endpoints = listOf(
-        Endpoint("https://platform-api2.max.ru", useHeaderAuth = true),
-        Endpoint("https://botapi.max.ru", useHeaderAuth = false)
-    )
+    private const val BASE_URL = "https://platform-api2.max.ru"
 
     class ApiException(message: String) : Exception(message)
 
     private fun encode(value: String): String = URLEncoder.encode(value, "UTF-8")
 
-    private fun request(endpoint: Endpoint, path: String, params: String, token: String, method: String, jsonBody: String?): String {
-        val query = if (endpoint.useHeaderAuth) params else {
-            if (params.isEmpty()) "access_token=${encode(token)}" else "access_token=${encode(token)}&$params"
-        }
-        val url = URL("${endpoint.baseUrl}$path${if (query.isNotEmpty()) "?$query" else ""}")
+    private fun request(path: String, params: String, token: String, method: String, jsonBody: String?): String {
+        val url = URL("$BASE_URL$path${if (params.isNotEmpty()) "?$params" else ""}")
         val connection = url.openConnection() as HttpURLConnection
         connection.requestMethod = method
         connection.connectTimeout = TIMEOUT_MS
         connection.readTimeout = TIMEOUT_MS
         connection.setRequestProperty("Content-Type", "application/json; charset=utf-8")
-        if (endpoint.useHeaderAuth) {
-            connection.setRequestProperty("Authorization", token)
-        }
+        connection.setRequestProperty("Authorization", token)
         if (jsonBody != null) {
             connection.doOutput = true
             connection.outputStream.use { os ->
@@ -60,42 +46,39 @@ object MaxApiClient {
         return text
     }
 
-    /** Пытается выполнить запрос через оба известных варианта API, пока один не сработает. */
-    private fun requestWithFallback(path: String, params: String, token: String, method: String, jsonBody: String?): String {
-        var lastError: Exception? = null
-        for (endpoint in endpoints) {
-            try {
-                return request(endpoint, path, params, token, method, jsonBody)
-            } catch (e: Exception) {
-                lastError = e
-            }
-        }
-        throw lastError ?: ApiException("Неизвестная ошибка запроса к MAX API")
-    }
-
     /** Проверяет токен, вызывая GET /me. Бросает ApiException при неверном токене. */
     fun checkToken(token: String) {
-        requestWithFallback("/me", "", token, "GET", null)
+        request("/me", "", token, "GET", null)
     }
 
     fun sendMessage(token: String, chatId: String, text: String) {
         val body = JSONObject().apply { put("text", text) }.toString()
-        requestWithFallback("/messages", "chat_id=${encode(chatId)}", token, "POST", body)
+        request("/messages", "chat_id=${encode(chatId)}", token, "POST", body)
     }
 
     data class DetectedChat(val chatId: Long, val title: String)
 
+    /** Возвращает title группы/канала (GET /chats/{chatId}). Для личных диалогов title всегда null. */
+    private fun fetchChatTitle(token: String, chatId: Long): String? = runCatching {
+        val text = request("/chats/$chatId", "", token, "GET", null)
+        JSONObject(text).optString("title").takeIf { it.isNotBlank() }
+    }.getOrNull()
+
     /**
      * Читает последние обновления бота (GET /updates) и извлекает chat_id
-     * из событий message_created / bot_started / user_added.
-     * Пользователь должен предварительно написать боту в MAX.
+     * из событий message_created / bot_started / user_added (личные диалоги)
+     * и bot_added (бота добавили в группу или канал — MAX присылает только
+     * chat_id, название группы отдельно запрашивается через GET /chats/{chatId}).
+     * Перед вызовом пользователь должен написать боту в MAX или добавить его в группу.
      */
     fun detectChatIds(token: String): List<DetectedChat> {
-        val text = requestWithFallback("/updates", "limit=100", token, "GET", null)
+        val text = request("/updates", "limit=100", token, "GET", null)
 
         val json = JSONObject(text)
         val updates = json.optJSONArray("updates") ?: return emptyList()
         val result = LinkedHashMap<Long, String>()
+        val titleCache = HashMap<Long, String?>()
+        fun titleFor(chatId: Long) = titleCache.getOrPut(chatId) { fetchChatTitle(token, chatId) }
 
         for (i in 0 until updates.length()) {
             val update = updates.getJSONObject(i)
@@ -103,13 +86,21 @@ object MaxApiClient {
                 "message_created" -> {
                     val message = update.optJSONObject("message") ?: continue
                     val chatId = message.optJSONObject("recipient")?.optLong("chat_id", -1L) ?: -1L
-                    val name = message.optJSONObject("sender")?.optString("name")
-                    if (chatId > 0) result[chatId] = name ?: "Диалог"
+                    if (chatId <= 0) continue
+                    val senderName = message.optJSONObject("sender")?.optString("name")
+                    result[chatId] = titleFor(chatId) ?: senderName ?: "Диалог"
                 }
                 "bot_started", "user_added" -> {
                     val chatId = update.optLong("chat_id", -1L)
+                    if (chatId <= 0) continue
                     val name = update.optJSONObject("user")?.optString("name")
-                    if (chatId > 0) result[chatId] = name ?: "Диалог"
+                    result[chatId] = titleFor(chatId) ?: name ?: "Диалог"
+                }
+                "bot_added" -> {
+                    val chatId = update.optLong("chat_id", -1L)
+                    if (chatId <= 0) continue
+                    val fallback = if (update.optBoolean("is_channel", false)) "Канал" else "Группа"
+                    result[chatId] = titleFor(chatId) ?: fallback
                 }
             }
         }

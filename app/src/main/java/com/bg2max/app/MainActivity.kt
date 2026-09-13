@@ -5,6 +5,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
@@ -34,7 +35,20 @@ class MainActivity : AppCompatActivity() {
         binding.inputChatId.setText(Prefs.getChatId(this))
         binding.switchEnabled.isChecked = Prefs.isEnabled(this)
 
-        binding.btnSave.setOnClickListener { saveSettings() }
+        val options = Prefs.getMessageOptions(this)
+        binding.checkboxRate.isChecked = options.includeRate
+        binding.checkboxNoise.isChecked = options.includeNoise
+        binding.checkboxBattery.isChecked = options.includeBattery
+        binding.checkboxSource.isChecked = options.includeSource
+        binding.checkboxSensorAge.isChecked = options.includeSensorAge
+
+        binding.btnSave.setOnClickListener {
+            saveSettings()
+            if (currentToken().isNotBlank() && currentChatId().isNotBlank()) {
+                collapseSettings()
+            }
+        }
+        binding.btnEditSettings.setOnClickListener { expandSettings() }
         binding.btnTestMessage.setOnClickListener { sendTestMessage() }
         binding.btnSimulateReading.setOnClickListener { simulateReading() }
         binding.btnDetectChatId.setOnClickListener { detectChatId() }
@@ -42,7 +56,23 @@ class MainActivity : AppCompatActivity() {
             onToggleEnabled(checked)
         }
 
+        if (currentToken().isBlank() || currentChatId().isBlank()) {
+            expandSettings()
+        } else {
+            collapseSettings()
+        }
+
         refreshStatusViews()
+    }
+
+    private fun expandSettings() {
+        binding.settingsPanel.visibility = View.VISIBLE
+        binding.settingsSummary.visibility = View.GONE
+    }
+
+    private fun collapseSettings() {
+        binding.settingsPanel.visibility = View.GONE
+        binding.settingsSummary.visibility = View.VISIBLE
     }
 
     override fun onResume() {
@@ -61,6 +91,16 @@ class MainActivity : AppCompatActivity() {
     private fun saveSettings() {
         Prefs.setToken(this, currentToken())
         Prefs.setChatId(this, currentChatId())
+        Prefs.setMessageOptions(
+            this,
+            Prefs.MessageOptions(
+                includeRate = binding.checkboxRate.isChecked,
+                includeNoise = binding.checkboxNoise.isChecked,
+                includeBattery = binding.checkboxBattery.isChecked,
+                includeSource = binding.checkboxSource.isChecked,
+                includeSensorAge = binding.checkboxSensorAge.isChecked
+            )
+        )
         Toast.makeText(this, "Настройки сохранены", Toast.LENGTH_SHORT).show()
     }
 
@@ -137,13 +177,21 @@ class MainActivity : AppCompatActivity() {
         saveSettings()
 
         val trends = listOf("Flat", "SingleUp", "FortyFiveUp", "DoubleUp", "SingleDown", "FortyFiveDown", "DoubleDown")
-        val mgdl = (70..220).random().toDouble()
-        val trend = trends.random()
         val timestamp = System.currentTimeMillis()
+        val reading = GlucoseReading(
+            mgdl = (70..220).random().toDouble(),
+            trendName = trends.random(),
+            timestampMs = timestamp,
+            rateMgdlPerMin = (-30..30).random() / 10.0,
+            sensorBatteryPercent = (40..100).random(),
+            noiseWarning = listOf(0, 0, 0, 1, 2).random(),
+            sourceDescription = "Симуляция (без xDrip+)",
+            sensorStartedAtMs = timestamp - (0..9).random() * 86_400_000L
+        )
 
         lifecycleScope.launch {
             withContext(Dispatchers.IO) {
-                GlucoseEventHandler.handle(this@MainActivity, mgdl, trend, timestamp)
+                GlucoseEventHandler.handle(this@MainActivity, reading)
             }
             refreshStatusViews()
         }
@@ -164,7 +212,8 @@ class MainActivity : AppCompatActivity() {
                 if (chats.isEmpty()) {
                     Toast.makeText(
                         this@MainActivity,
-                        "Диалоги не найдены. Напишите боту в MAX и повторите.",
+                        "Ничего не найдено. Попробуйте ещё раз сразу после сообщения боту, " +
+                            "либо введите Chat ID вручную — его видно в адресе чата на web.max.ru",
                         Toast.LENGTH_LONG
                     ).show()
                     return@onSuccess

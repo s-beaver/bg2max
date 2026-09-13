@@ -23,40 +23,126 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:layout_marginBottom="16dp"
-            android:text="Показатели глюкозы из xDrip+ автоматически пересылаются в бота MAX.\n\n1. Создайте бота через @MasterBot в MAX (команда /create), получите токен.\n2. В xDrip+: Настройки → App Integrations Settings → включите «Локальная трансляция данных». В поле «Identify receiver» укажите com.bg2max.app.\n3. Вставьте токен ниже, напишите вашему боту в MAX что-нибудь (например /start), затем нажмите «Определить Chat ID».\n4. Включите трансляцию."
+            android:text="Показатели глюкозы из xDrip+ автоматически пересылаются в бота MAX — в личный чат или в группу.\n\n1. Заведите бота на business.max.ru (нужен подтверждённый профиль организации, ИП или самозанятого): раздел «Чат-боты» → «Создать». После проверки (до 48 часов) в настройках бота появится токен.\n2. В xDrip+: Настройки → Настройки интеграций с приложениями → включите «Локальная трансляция данных». В поле «Установить получателя» укажите com.bg2max.app.\n3. Вставьте токен ниже. Затем либо напишите боту что-нибудь лично (например /start), либо добавьте его в нужную группу — и нажмите «Определить Chat ID».\n4. Включите трансляцию."
             android:textSize="13sp"
             android:textColor="#666666" />
 
-        <com.google.android.material.textfield.TextInputLayout
+        <LinearLayout
+            android:id="@+id/settingsPanel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Токен бота MAX">
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/inputBotToken"
+            android:orientation="vertical">
+
+            <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="textPassword" />
-        </com.google.android.material.textfield.TextInputLayout>
+                android:hint="Токен бота MAX">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/inputBotToken"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textPassword" />
+            </com.google.android.material.textfield.TextInputLayout>
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:hint="Chat ID">
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/inputChatId"
+            <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="numberSigned" />
-        </com.google.android.material.textfield.TextInputLayout>
+                android:layout_marginTop="8dp"
+                android:hint="Chat ID">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/inputChatId"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="numberSigned" />
+            </com.google.android.material.textfield.TextInputLayout>
 
-        <Button
-            android:id="@+id/btnDetectChatId"
-            style="@style/Widget.Material3.Button.TonalButton"
+            <Button
+                android:id="@+id/btnDetectChatId"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Определить Chat ID" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="Что включать в сообщение"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:layout_marginBottom="4dp"
+                android:text="Значение глюкозы, стрелка тренда и время отправляются всегда"
+                android:textSize="12sp"
+                android:textColor="#666666" />
+
+            <CheckBox
+                android:id="@+id/checkboxRate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Скорость изменения (ммоль/л/мин)" />
+
+            <CheckBox
+                android:id="@+id/checkboxNoise"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Предупреждение о шуме сигнала" />
+
+            <CheckBox
+                android:id="@+id/checkboxBattery"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Заряд батареи сенсора" />
+
+            <CheckBox
+                android:id="@+id/checkboxSource"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Источник данных (модель CGM)" />
+
+            <CheckBox
+                android:id="@+id/checkboxSensorAge"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Возраст сенсора (дни)" />
+
+            <Button
+                android:id="@+id/btnSave"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Сохранить настройки" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/settingsSummary"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="Определить Chat ID" />
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Токен и chat ID сохранены"
+                android:textSize="14sp"
+                android:textColor="#666666" />
+
+            <Button
+                android:id="@+id/btnEditSettings"
+                style="@style/Widget.Material3.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Изменить" />
+
+        </LinearLayout>
 
         <com.google.android.material.materialswitch.MaterialSwitch
             android:id="@+id/switchEnabled"
@@ -64,13 +150,6 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:text="Транслировать в MAX" />
-
-        <Button
-            android:id="@+id/btnSave"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="Сохранить настройки" />
 
         <Button
             android:id="@+id/btnTestMessage"

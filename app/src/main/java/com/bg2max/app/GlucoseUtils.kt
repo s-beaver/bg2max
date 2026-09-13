@@ -17,9 +17,43 @@ object GlucoseUtils {
         else -> ""
     }
 
-    fun formatMessage(mmol: Double, trendArrow: String, timestampMs: Long): String {
-        val timeStr = android.text.format.DateFormat.format("HH:mm", timestampMs)
-        val arrowPart = if (trendArrow.isNotEmpty()) " $trendArrow" else ""
-        return "🩸 Глюкоза: %.1f ммоль/л%s\n🕒 %s".format(mmol, arrowPart, timeStr)
+    fun formatMessage(reading: GlucoseReading, options: Prefs.MessageOptions): String {
+        val mmol = mgdlToMmol(reading.mgdl)
+        val arrow = trendArrow(reading.trendName)
+        val timeStr = android.text.format.DateFormat.format("HH:mm", reading.timestampMs)
+        val arrowPart = if (arrow.isNotEmpty()) " $arrow" else ""
+
+        val lines = mutableListOf("🩸 Глюкоза: %.1f ммоль/л%s".format(mmol, arrowPart))
+
+        if (options.includeRate) {
+            reading.rateMgdlPerMin?.let { rate ->
+                val rateMmol = mgdlToMmol(rate)
+                lines += "📈 Скорость: %+.2f ммоль/л/мин".format(rateMmol)
+            }
+        }
+        if (options.includeNoise) {
+            reading.noiseWarning?.takeIf { it > 0 }?.let { level ->
+                lines += "⚠️ Шум сигнала: уровень $level"
+            }
+        }
+        if (options.includeBattery) {
+            reading.sensorBatteryPercent?.let { battery ->
+                lines += "🔋 Батарея сенсора: $battery%"
+            }
+        }
+        if (options.includeSource) {
+            reading.sourceDescription?.takeIf { it.isNotBlank() }?.let { source ->
+                lines += "📡 Источник: $source"
+            }
+        }
+        if (options.includeSensorAge) {
+            reading.sensorStartedAtMs?.takeIf { it > 0 }?.let { startedAt ->
+                val ageDays = (reading.timestampMs - startedAt) / 86_400_000.0
+                lines += "🗓 Сенсор: день ${ageDays.toInt() + 1}"
+            }
+        }
+
+        lines += "🕒 $timeStr"
+        return lines.joinToString("\n")
     }
 }

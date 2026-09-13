@@ -12,6 +12,20 @@ object Prefs {
     private const val KEY_LAST_TREND = "last_trend"
     private const val KEY_LAST_TIME = "last_time"
     private const val KEY_LOG = "log"
+    private const val KEY_INCLUDE_RATE = "include_rate"
+    private const val KEY_INCLUDE_NOISE = "include_noise"
+    private const val KEY_INCLUDE_BATTERY = "include_battery"
+    private const val KEY_INCLUDE_SOURCE = "include_source"
+    private const val KEY_INCLUDE_SENSOR_AGE = "include_sensor_age"
+
+    /** Какие необязательные поля добавлять в текст сообщения, отправляемого в MAX. */
+    data class MessageOptions(
+        val includeRate: Boolean,
+        val includeNoise: Boolean,
+        val includeBattery: Boolean,
+        val includeSource: Boolean,
+        val includeSensorAge: Boolean
+    )
 
     private fun prefs(context: Context) =
         context.getSharedPreferences(FILE, Context.MODE_PRIVATE)
@@ -58,4 +72,25 @@ object Prefs {
     }
 
     fun getLog(context: Context): String = prefs(context).getString(KEY_LOG, "") ?: ""
+
+    fun getMessageOptions(context: Context): MessageOptions {
+        val p = prefs(context)
+        return MessageOptions(
+            includeRate = p.getBoolean(KEY_INCLUDE_RATE, false),
+            includeNoise = p.getBoolean(KEY_INCLUDE_NOISE, false),
+            includeBattery = p.getBoolean(KEY_INCLUDE_BATTERY, false),
+            includeSource = p.getBoolean(KEY_INCLUDE_SOURCE, false),
+            includeSensorAge = p.getBoolean(KEY_INCLUDE_SENSOR_AGE, false)
+        )
+    }
+
+    fun setMessageOptions(context: Context, options: MessageOptions) {
+        prefs(context).edit()
+            .putBoolean(KEY_INCLUDE_RATE, options.includeRate)
+            .putBoolean(KEY_INCLUDE_NOISE, options.includeNoise)
+            .putBoolean(KEY_INCLUDE_BATTERY, options.includeBattery)
+            .putBoolean(KEY_INCLUDE_SOURCE, options.includeSource)
+            .putBoolean(KEY_INCLUDE_SENSOR_AGE, options.includeSensorAge)
+            .apply()
+    }
 }

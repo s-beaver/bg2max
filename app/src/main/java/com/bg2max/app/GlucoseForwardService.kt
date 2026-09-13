@@ -34,6 +34,16 @@ class GlucoseForwardService : Service() {
         private const val EXTRA_BG_ESTIMATE = "com.eveningoutpost.dexdrip.Extras.BgEstimate"
         private const val EXTRA_BG_SLOPE_NAME = "com.eveningoutpost.dexdrip.Extras.BgSlopeName"
         private const val EXTRA_TIMESTAMP = "com.eveningoutpost.dexdrip.Extras.Time"
+
+        // Необязательные поля того же broadcast'а — см. GlucoseReading.
+        private const val EXTRA_BG_SLOPE = "com.eveningoutpost.dexdrip.Extras.BgSlope"
+        private const val EXTRA_SENSOR_BATTERY = "com.eveningoutpost.dexdrip.Extras.SensorBattery"
+        private const val EXTRA_NOISE_WARNING = "com.eveningoutpost.dexdrip.Extras.NoiseWarning"
+        private const val EXTRA_SENSOR_STARTED_AT = "com.eveningoutpost.dexdrip.Extras.SensorStartedAt"
+        private const val EXTRA_SOURCE_DESC = "com.eveningoutpost.dexdrip.Extras.SourceDesc"
+
+        /** xDrip хранит слоп в мг/дл в миллисекунду, переводим в мг/дл в минуту. */
+        private const val SLOPE_MS_TO_MIN = 60_000.0
     }
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
@@ -48,8 +58,27 @@ class GlucoseForwardService : Service() {
             val trendName = extras.getString(EXTRA_BG_SLOPE_NAME)
             val timestamp = extras.getLong(EXTRA_TIMESTAMP, System.currentTimeMillis())
 
+            val reading = GlucoseReading(
+                mgdl = mgdl,
+                trendName = trendName,
+                timestampMs = timestamp,
+                rateMgdlPerMin = if (extras.containsKey(EXTRA_BG_SLOPE)) {
+                    extras.getDouble(EXTRA_BG_SLOPE) * SLOPE_MS_TO_MIN
+                } else null,
+                sensorBatteryPercent = if (extras.containsKey(EXTRA_SENSOR_BATTERY)) {
+                    extras.getInt(EXTRA_SENSOR_BATTERY)
+                } else null,
+                noiseWarning = if (extras.containsKey(EXTRA_NOISE_WARNING)) {
+                    extras.getInt(EXTRA_NOISE_WARNING)
+                } else null,
+                sourceDescription = extras.getString(EXTRA_SOURCE_DESC),
+                sensorStartedAtMs = if (extras.containsKey(EXTRA_SENSOR_STARTED_AT)) {
+                    extras.getLong(EXTRA_SENSOR_STARTED_AT)
+                } else null
+            )
+
             scope.launch {
-                GlucoseEventHandler.handle(applicationContext, mgdl, trendName, timestamp)
+                GlucoseEventHandler.handle(applicationContext, reading)
             }
         }
     }

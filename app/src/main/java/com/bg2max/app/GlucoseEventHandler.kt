@@ -10,10 +10,10 @@ import android.content.Context
  */
 object GlucoseEventHandler {
 
-    fun handle(context: Context, mgdl: Double, trendName: String?, timestampMs: Long) {
-        val mmol = GlucoseUtils.mgdlToMmol(mgdl)
-        val arrow = GlucoseUtils.trendArrow(trendName)
-        Prefs.setLastReading(context, mmol, arrow, timestampMs)
+    fun handle(context: Context, reading: GlucoseReading) {
+        val mmol = GlucoseUtils.mgdlToMmol(reading.mgdl)
+        val arrow = GlucoseUtils.trendArrow(reading.trendName)
+        Prefs.setLastReading(context, mmol, arrow, reading.timestampMs)
 
         val token = Prefs.getToken(context)
         val chatId = Prefs.getChatId(context)
@@ -22,7 +22,7 @@ object GlucoseEventHandler {
             return
         }
 
-        val text = GlucoseUtils.formatMessage(mmol, arrow, timestampMs)
+        val text = GlucoseUtils.formatMessage(reading, Prefs.getMessageOptions(context))
         try {
             MaxApiClient.sendMessage(token, chatId, text)
             Prefs.appendLog(context, "Отправлено: %.1f ммоль/л %s".format(mmol, arrow))
