@@ -28,6 +28,11 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (!DisclaimerActivity.isAccepted(this)) {
+            startActivity(Intent(this, DisclaimerActivity::class.java))
+            finish()
+            return
+        }
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -55,6 +60,7 @@ class MainActivity : AppCompatActivity() {
         binding.btnTestMessage.setOnClickListener { sendTestMessage() }
         binding.btnSimulateReading.setOnClickListener { simulateReading() }
         binding.btnDetectChatId.setOnClickListener { detectChatId() }
+        binding.btnDisclaimer.setOnClickListener { startActivity(DisclaimerActivity.viewIntent(this)) }
         binding.switchEnabled.setOnCheckedChangeListener { _, checked ->
             onToggleEnabled(checked)
         }
@@ -86,6 +92,7 @@ class MainActivity : AppCompatActivity() {
     private fun refreshStatusViews() {
         binding.textLastReading.text = Prefs.getLastReadingText(this)
         binding.textLog.text = Prefs.getLog(this)
+        binding.textAapsDump.text = Prefs.getLastAapsDumpText(this)
     }
 
     private fun currentToken(): String = binding.inputBotToken.text?.toString()?.trim().orEmpty()

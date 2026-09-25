@@ -13,6 +13,9 @@ object Prefs {
     private const val KEY_LAST_TIME = "last_time"
     private const val KEY_LAST_MGDL = "last_mgdl"
     private const val KEY_LOG = "log"
+    private const val KEY_AAPS_DUMP = "aaps_dump"
+    private const val KEY_AAPS_DUMP_TIME = "aaps_dump_time"
+    private const val KEY_DISCLAIMER_VERSION = "disclaimer_accepted_version"
     private const val KEY_INCLUDE_DELTA = "include_delta"
     private const val KEY_INCLUDE_RATE = "include_rate"
     private const val KEY_INCLUDE_NOISE = "include_noise"
@@ -82,6 +85,28 @@ object Prefs {
             .take(30)
             .joinToString("\n")
         prefs(context).edit().putString(KEY_LOG, updated).apply()
+    }
+
+    fun setLastAapsDump(context: Context, receivedAt: Long, dump: String) {
+        prefs(context).edit()
+            .putLong(KEY_AAPS_DUMP_TIME, receivedAt)
+            .putString(KEY_AAPS_DUMP, dump)
+            .apply()
+    }
+
+    fun getLastAapsDumpText(context: Context): String {
+        val time = prefs(context).getLong(KEY_AAPS_DUMP_TIME, 0L)
+        if (time == 0L) return "Данных от AndroidAPS пока не было"
+        val timeStr = android.text.format.DateFormat.format("dd.MM HH:mm:ss", time)
+        return "Получено $timeStr\n" + (prefs(context).getString(KEY_AAPS_DUMP, "") ?: "")
+    }
+
+    /** Версия отказа от ответственности, с которой согласился пользователь (0 — ещё не соглашался). */
+    fun getAcceptedDisclaimerVersion(context: Context): Int =
+        prefs(context).getInt(KEY_DISCLAIMER_VERSION, 0)
+
+    fun setAcceptedDisclaimerVersion(context: Context, version: Int) {
+        prefs(context).edit().putInt(KEY_DISCLAIMER_VERSION, version).apply()
     }
 
     fun getLog(context: Context): String = prefs(context).getString(KEY_LOG, "") ?: ""

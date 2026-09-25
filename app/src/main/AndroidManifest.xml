@@ -33,10 +33,24 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".DisclaimerActivity"
+            android:exported="false" />
+
         <service
             android:name=".GlucoseForwardService"
             android:exported="false"
             android:foregroundServiceType="dataSync" />
+
+        <!-- IOB/COB от AndroidAPS (модуль «Samsung Tizen»). Должен быть в манифесте:
+             AAPS находит получателей через queryBroadcastReceivers. -->
+        <receiver
+            android:name=".AapsStatusReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="info.nightscout.androidaps.status" />
+            </intent-filter>
+        </receiver>
 
         <receiver
             android:name=".BootReceiver"
