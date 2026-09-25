@@ -11,8 +11,10 @@ android {
         applicationId = "com.bg2max.app"
         minSdk = 26
         targetSdk = 34
-        versionCode = 1
-        versionName = "1.0"
+        // При каждом релизе: versionCode +1, versionName по SemVer, запись в CHANGELOG.md,
+        // git-тег vX.Y.Z на коммите релиза.
+        versionCode = 2
+        versionName = "1.1.0"
     }
 
     buildTypes {
@@ -33,8 +35,12 @@ android {
 
     buildFeatures {
         viewBinding = true
+        buildConfig = true
     }
 }
+
+// APK с номером версии в имени: bg2max-1.1.0-debug.apk
+base.archivesName.set("bg2max-${android.defaultConfig.versionName}")
 
 dependencies {
     implementation("androidx.core:core-ktx:1.12.0")

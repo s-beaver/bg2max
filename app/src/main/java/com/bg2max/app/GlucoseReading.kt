@@ -14,5 +14,8 @@ data class GlucoseReading(
     val sensorBatteryPercent: Int? = null,
     val noiseWarning: Int? = null,
     val sourceDescription: String? = null,
-    val sensorStartedAtMs: Long? = null
+    val sensorStartedAtMs: Long? = null,
+    /** Разница с предыдущим показанием; не из broadcast, считается в GlucoseEventHandler. */
+    val deltaMgdl: Double? = null,
+    val deltaMinutes: Int? = null
 )

@@ -27,7 +27,16 @@
 ./gradlew assembleDebug
 ```
 
-APK появится в `app/build/outputs/apk/debug/app-debug.apk`.
+APK появится в `app/build/outputs/apk/debug/bg2max-<версия>-debug.apk`.
+
+## Версии
+
+История изменений — в [CHANGELOG.md](CHANGELOG.md). Текущая версия видна в заголовке приложения.
+
+Выпуск новой версии:
+1. В `app/build.gradle.kts` увеличить `versionCode` на 1 и поднять `versionName` (SemVer: исправление → `1.1.1`, новая возможность → `1.2.0`).
+2. Перенести пункты из раздела «Не выпущено» в `CHANGELOG.md` под новый номер с датой.
+3. Закоммитить и поставить тег: `git tag v1.2.0 && git push --tags`.
 
 ## Стек
 

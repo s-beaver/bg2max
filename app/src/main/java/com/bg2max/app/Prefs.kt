@@ -11,7 +11,9 @@ object Prefs {
     private const val KEY_LAST_MMOL = "last_mmol"
     private const val KEY_LAST_TREND = "last_trend"
     private const val KEY_LAST_TIME = "last_time"
+    private const val KEY_LAST_MGDL = "last_mgdl"
     private const val KEY_LOG = "log"
+    private const val KEY_INCLUDE_DELTA = "include_delta"
     private const val KEY_INCLUDE_RATE = "include_rate"
     private const val KEY_INCLUDE_NOISE = "include_noise"
     private const val KEY_INCLUDE_BATTERY = "include_battery"
@@ -20,6 +22,7 @@ object Prefs {
 
     /** Какие необязательные поля добавлять в текст сообщения, отправляемого в MAX. */
     data class MessageOptions(
+        val includeDelta: Boolean,
         val includeRate: Boolean,
         val includeNoise: Boolean,
         val includeBattery: Boolean,
@@ -45,8 +48,18 @@ object Prefs {
         prefs(context).edit().putBoolean(KEY_ENABLED, value).apply()
     }
 
-    fun setLastReading(context: Context, mmol: Double, trendArrow: String, timestamp: Long) {
+    /** Предыдущее показание (мг/дл и время) — для расчёта дельты; null, если его ещё не было. */
+    fun getLastMgdl(context: Context): Pair<Double, Long>? {
+        val p = prefs(context)
+        if (!p.contains(KEY_LAST_MGDL)) return null
+        val time = p.getLong(KEY_LAST_TIME, 0L)
+        if (time == 0L) return null
+        return p.getFloat(KEY_LAST_MGDL, 0f).toDouble() to time
+    }
+
+    fun setLastReading(context: Context, mgdl: Double, mmol: Double, trendArrow: String, timestamp: Long) {
         prefs(context).edit()
+            .putFloat(KEY_LAST_MGDL, mgdl.toFloat())
             .putFloat(KEY_LAST_MMOL, mmol.toFloat())
             .putString(KEY_LAST_TREND, trendArrow)
             .putLong(KEY_LAST_TIME, timestamp)
@@ -76,6 +89,7 @@ object Prefs {
     fun getMessageOptions(context: Context): MessageOptions {
         val p = prefs(context)
         return MessageOptions(
+            includeDelta = p.getBoolean(KEY_INCLUDE_DELTA, false),
             includeRate = p.getBoolean(KEY_INCLUDE_RATE, false),
             includeNoise = p.getBoolean(KEY_INCLUDE_NOISE, false),
             includeBattery = p.getBoolean(KEY_INCLUDE_BATTERY, false),
@@ -86,6 +100,7 @@ object Prefs {
 
     fun setMessageOptions(context: Context, options: MessageOptions) {
         prefs(context).edit()
+            .putBoolean(KEY_INCLUDE_DELTA, options.includeDelta)
             .putBoolean(KEY_INCLUDE_RATE, options.includeRate)
             .putBoolean(KEY_INCLUDE_NOISE, options.includeNoise)
             .putBoolean(KEY_INCLUDE_BATTERY, options.includeBattery)

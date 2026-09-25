@@ -31,11 +31,14 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        binding.textVersion.text = "v${BuildConfig.VERSION_NAME}"
+
         binding.inputBotToken.setText(Prefs.getToken(this))
         binding.inputChatId.setText(Prefs.getChatId(this))
         binding.switchEnabled.isChecked = Prefs.isEnabled(this)
 
         val options = Prefs.getMessageOptions(this)
+        binding.checkboxDelta.isChecked = options.includeDelta
         binding.checkboxRate.isChecked = options.includeRate
         binding.checkboxNoise.isChecked = options.includeNoise
         binding.checkboxBattery.isChecked = options.includeBattery
@@ -94,6 +97,7 @@ class MainActivity : AppCompatActivity() {
         Prefs.setMessageOptions(
             this,
             Prefs.MessageOptions(
+                includeDelta = binding.checkboxDelta.isChecked,
                 includeRate = binding.checkboxRate.isChecked,
                 includeNoise = binding.checkboxNoise.isChecked,
                 includeBattery = binding.checkboxBattery.isChecked,

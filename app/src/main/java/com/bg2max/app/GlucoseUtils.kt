@@ -25,6 +25,13 @@ object GlucoseUtils {
 
         val lines = mutableListOf("🩸 Глюкоза: %.1f ммоль/л%s".format(mmol, arrowPart))
 
+        if (options.includeDelta) {
+            reading.deltaMgdl?.let { delta ->
+                val deltaMmol = mgdlToMmol(delta)
+                val minutes = reading.deltaMinutes?.takeIf { it > 0 }?.let { " за $it мин" } ?: ""
+                lines += "Δ Изменение: %+.1f ммоль/л%s".format(deltaMmol, minutes)
+            }
+        }
         if (options.includeRate) {
             reading.rateMgdlPerMin?.let { rate ->
                 val rateMmol = mgdlToMmol(rate)
