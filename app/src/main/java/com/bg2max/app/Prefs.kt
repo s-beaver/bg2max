@@ -22,6 +22,8 @@ object Prefs {
     private const val KEY_INCLUDE_BATTERY = "include_battery"
     private const val KEY_INCLUDE_SOURCE = "include_source"
     private const val KEY_INCLUDE_SENSOR_AGE = "include_sensor_age"
+    private const val LOG_FILE = "bg2max.log"
+    private const val LOG_FILE_MAX_BYTES = 1_000_000L
 
     /** Какие необязательные поля добавлять в текст сообщения, отправляемого в MAX. */
     data class MessageOptions(
@@ -78,13 +80,46 @@ object Prefs {
         return "%.1f ммоль/л %s (%s)".format(mmol, trend, timeStr)
     }
 
+    /**
+     * Короткий журнал (30 строк, новые сверху) для экрана и полный — в файле, чтобы
+     * после многодневной проверки можно было переслать его целиком («Поделиться журналом»).
+     */
+    @Synchronized
     fun appendLog(context: Context, line: String) {
-        val timeStr = android.text.format.DateFormat.format("HH:mm:ss", System.currentTimeMillis())
+        val now = System.currentTimeMillis()
+        val timeStr = android.text.format.DateFormat.format("HH:mm:ss", now)
         val existing = prefs(context).getString(KEY_LOG, "") ?: ""
         val updated = (listOf("[$timeStr] $line") + existing.lines().filter { it.isNotBlank() })
             .take(30)
             .joinToString("\n")
         prefs(context).edit().putString(KEY_LOG, updated).apply()
+
+        val dateStr = android.text.format.DateFormat.format("dd.MM HH:mm:ss", now)
+        runCatching {
+            val file = logFile(context)
+            if (file.length() > LOG_FILE_MAX_BYTES) {
+                file.copyTo(java.io.File(context.filesDir, "$LOG_FILE.old"), overwrite = true)
+                file.writeText("")
+            }
+            file.appendText("[$dateStr] $line\n")
+        }
+    }
+
+    private fun logFile(context: Context) = java.io.File(context.filesDir, LOG_FILE)
+
+    /** Полный журнал из файла: предыдущая часть (если файл уже переполнялся) + текущая. */
+    @Synchronized
+    fun getFullLog(context: Context): String {
+        val old = java.io.File(context.filesDir, "$LOG_FILE.old")
+        return (if (old.exists()) old.readText() else "") +
+            (logFile(context).takeIf { it.exists() }?.readText() ?: "")
+    }
+
+    @Synchronized
+    fun clearLog(context: Context) {
+        prefs(context).edit().remove(KEY_LOG).apply()
+        logFile(context).delete()
+        java.io.File(context.filesDir, "$LOG_FILE.old").delete()
     }
 
     fun setLastAapsDump(context: Context, receivedAt: Long, dump: String) {

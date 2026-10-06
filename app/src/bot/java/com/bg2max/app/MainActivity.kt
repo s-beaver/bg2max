@@ -42,13 +42,7 @@ class MainActivity : AppCompatActivity() {
         binding.inputChatId.setText(Prefs.getChatId(this))
         binding.switchEnabled.isChecked = Prefs.isEnabled(this)
 
-        val options = Prefs.getMessageOptions(this)
-        binding.checkboxDelta.isChecked = options.includeDelta
-        binding.checkboxRate.isChecked = options.includeRate
-        binding.checkboxNoise.isChecked = options.includeNoise
-        binding.checkboxBattery.isChecked = options.includeBattery
-        binding.checkboxSource.isChecked = options.includeSource
-        binding.checkboxSensorAge.isChecked = options.includeSensorAge
+        MessageOptionsView.show(binding.messageOptions, Prefs.getMessageOptions(this))
 
         binding.btnSave.setOnClickListener {
             saveSettings()
@@ -101,17 +95,7 @@ class MainActivity : AppCompatActivity() {
     private fun saveSettings() {
         Prefs.setToken(this, currentToken())
         Prefs.setChatId(this, currentChatId())
-        Prefs.setMessageOptions(
-            this,
-            Prefs.MessageOptions(
-                includeDelta = binding.checkboxDelta.isChecked,
-                includeRate = binding.checkboxRate.isChecked,
-                includeNoise = binding.checkboxNoise.isChecked,
-                includeBattery = binding.checkboxBattery.isChecked,
-                includeSource = binding.checkboxSource.isChecked,
-                includeSensorAge = binding.checkboxSensorAge.isChecked
-            )
-        )
+        Prefs.setMessageOptions(this, MessageOptionsView.read(binding.messageOptions))
         Toast.makeText(this, "Настройки сохранены", Toast.LENGTH_SHORT).show()
     }
 

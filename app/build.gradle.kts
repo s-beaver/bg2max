@@ -17,6 +17,25 @@ android {
         versionName = "1.1.0"
     }
 
+    // Два варианта приложения из одного кода (общий код — src/main):
+    //  bot   — отправка через MAX Bot API, нужен свой бот и его токен (src/bot);
+    //  reply — отправка кнопкой «Ответить» из уведомления MAX от имени аккаунта
+    //          на этом телефоне, без бота, токена и доступа в интернет (src/reply).
+    // Разные applicationId — оба можно поставить на один телефон.
+    flavorDimensions += "transport"
+    productFlavors {
+        create("bot") {
+            dimension = "transport"
+        }
+        create("reply") {
+            dimension = "transport"
+            applicationIdSuffix = ".reply"
+            // Своя нумерация: вариант экспериментальный, выпускается отдельно от bot.
+            versionCode = 1
+            versionName = "0.1.0"
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -39,8 +58,15 @@ android {
     }
 }
 
-// APK с номером версии в имени: bg2max-1.1.0-debug.apk
-base.archivesName.set("bg2max-${android.defaultConfig.versionName}")
+// APK с вариантом и номером версии в имени: bg2max-bot-1.1.0-debug.apk, bg2max-reply-0.1.0-debug.apk
+@Suppress("DEPRECATION")
+android.applicationVariants.all {
+    val variant = this
+    outputs.all {
+        (this as com.android.build.gradle.internal.api.BaseVariantOutputImpl).outputFileName =
+            "bg2max-${variant.flavorName}-${variant.versionName}-${variant.buildType.name}.apk"
+    }
+}
 
 dependencies {
     implementation("androidx.core:core-ktx:1.12.0")

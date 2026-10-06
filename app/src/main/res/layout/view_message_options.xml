@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Галочки «Что включать в сообщение» — общие для обоих вариантов приложения. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="Что включать в сообщение"
+        android:textStyle="bold" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:layout_marginBottom="4dp"
+        android:text="Значение глюкозы, стрелка тренда и время отправляются всегда"
+        android:textSize="12sp"
+        android:textColor="#666666" />
+
+    <CheckBox
+        android:id="@+id/checkboxDelta"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Изменение с прошлого показания (дельта)" />
+
+    <CheckBox
+        android:id="@+id/checkboxRate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Скорость изменения (ммоль/л/мин)" />
+
+    <CheckBox
+        android:id="@+id/checkboxNoise"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Предупреждение о шуме сигнала" />
+
+    <CheckBox
+        android:id="@+id/checkboxBattery"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Заряд батареи сенсора" />
+
+    <CheckBox
+        android:id="@+id/checkboxSource"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Источник данных (модель CGM)" />
+
+    <CheckBox
+        android:id="@+id/checkboxSensorAge"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Возраст сенсора (дни)" />
+
+</LinearLayout>

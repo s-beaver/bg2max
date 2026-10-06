@@ -5,7 +5,7 @@ import android.content.Context
 /**
  * Единая точка обработки нового показания глюкозы — используется и настоящим
  * приёмником broadcast от xDrip+ (GlucoseForwardService), и симулятором из
- * MainActivity для тестирования без xDrip+. Выполняет сетевой запрос,
+ * MainActivity для тестирования без xDrip+. Может выполнять сетевой запрос (вариант bot),
  * поэтому вызывать нужно из фонового потока/корутины.
  */
 object GlucoseEventHandler {
@@ -19,20 +19,9 @@ object GlucoseEventHandler {
         val arrow = GlucoseUtils.trendArrow(reading.trendName)
         Prefs.setLastReading(context, reading.mgdl, mmol, arrow, reading.timestampMs)
 
-        val token = Prefs.getToken(context)
-        val chatId = Prefs.getChatId(context)
-        if (token.isBlank() || chatId.isBlank()) {
-            Prefs.appendLog(context, "Показание получено, но токен/chat ID не заданы")
-            return
-        }
-
         val text = GlucoseUtils.formatMessage(reading, Prefs.getMessageOptions(context))
-        try {
-            MaxApiClient.sendMessage(token, chatId, text)
-            Prefs.appendLog(context, "Отправлено: %.1f ммоль/л %s".format(mmol, arrow))
-        } catch (e: Exception) {
-            Prefs.appendLog(context, "Ошибка отправки: ${e.message}")
-        }
+        // Способ отправки свой у каждого варианта приложения: src/bot или src/reply.
+        ReadingSender.send(context, text, "%.1f ммоль/л %s".format(mmol, arrow), reading.timestampMs)
     }
 
     private fun withDelta(reading: GlucoseReading, previous: Pair<Double, Long>?): GlucoseReading {

@@ -44,6 +44,39 @@ class GlucoseForwardService : Service() {
 
         /** xDrip хранит слоп в мг/дл в миллисекунду, переводим в мг/дл в минуту. */
         private const val SLOPE_MS_TO_MIN = 60_000.0
+
+        /** Текст постоянного уведомления; null — стандартный. Переживает пересоздание сервиса. */
+        @Volatile
+        private var statusText: String? = null
+
+        /**
+         * Меняет текст постоянного уведомления сервиса — например, чтобы показать на
+         * телефоне, что отправка сейчас невозможна. Если сервис не запущен, ничего не делает.
+         */
+        fun setStatus(context: Context, text: String?) {
+            if (statusText == text) return
+            statusText = text
+            if (!Prefs.isEnabled(context)) return
+            val manager = context.getSystemService(NotificationManager::class.java)
+            runCatching { manager.notify(NOTIFICATION_ID, buildNotification(context)) }
+        }
+
+        private fun buildNotification(context: Context): Notification {
+            val openAppIntent = Intent(context, MainActivity::class.java)
+            val pendingIntent = PendingIntent.getActivity(
+                context, 0, openAppIntent,
+                PendingIntent.FLAG_IMMUTABLE
+            )
+            val text = statusText ?: context.getString(R.string.notification_text)
+            return NotificationCompat.Builder(context, CHANNEL_ID)
+                .setContentTitle(context.getString(R.string.app_name))
+                .setContentText(text)
+                .setStyle(NotificationCompat.BigTextStyle().bigText(text))
+                .setSmallIcon(android.R.drawable.ic_menu_compass)
+                .setContentIntent(pendingIntent)
+                .setOngoing(true)
+                .build()
+        }
     }
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
@@ -86,7 +119,7 @@ class GlucoseForwardService : Service() {
     override fun onCreate() {
         super.onCreate()
         createNotificationChannel()
-        startForeground(NOTIFICATION_ID, buildNotification())
+        startForeground(NOTIFICATION_ID, buildNotification(this))
 
         val filter = IntentFilter().apply {
             addAction(ACTION_NEW_BG_ESTIMATE)
@@ -116,20 +149,5 @@ class GlucoseForwardService : Service() {
             )
             manager.createNotificationChannel(channel)
         }
-    }
-
-    private fun buildNotification(): Notification {
-        val openAppIntent = Intent(this, MainActivity::class.java)
-        val pendingIntent = PendingIntent.getActivity(
-            this, 0, openAppIntent,
-            PendingIntent.FLAG_IMMUTABLE
-        )
-        return NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle(getString(R.string.app_name))
-            .setContentText(getString(R.string.notification_text))
-            .setSmallIcon(android.R.drawable.ic_menu_compass)
-            .setContentIntent(pendingIntent)
-            .setOngoing(true)
-            .build()
     }
 }
