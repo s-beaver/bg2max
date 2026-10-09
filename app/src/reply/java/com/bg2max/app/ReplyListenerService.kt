@@ -28,6 +28,9 @@ class ReplyListenerService : NotificationListenerService() {
         // восстанавливается сразу после перезапуска процесса.
         activeNotifications?.filter { it.packageName == MAX_PACKAGE }?.forEach { process(it, "в шторке") }
         val wanted = ReplyPrefs.getTarget(this)
+        if (wanted != null && ReplyState.target == null && ReadingSender.currentButton(this) != null) {
+            ReadingSender.onButtonCaptured(this)
+        }
         if (wanted != null && ReplyState.target == null) {
             Prefs.appendLog(this, "Кнопки ответа «${wanted.chatName}» нет — жду новое сообщение из этого чата")
         }
@@ -115,6 +118,7 @@ class ReplyListenerService : NotificationListenerService() {
         }
         val renewed = saved == null || button.pendingIntent != saved.pendingIntent
         ReplyState.target = button
+        if (renewed) ReplyBackup.save(this, button)
         val wasBlocked = ReplyState.blockedBy != null
         ReplyState.blockedBy = null
         Prefs.appendLog(this, "MAX ($event): «$chatName», id=${sbn.id} — кнопка ответа " +

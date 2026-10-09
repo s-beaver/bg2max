@@ -6,8 +6,8 @@ import android.content.Context
 
 /**
  * Кнопка «Ответить» из уведомления MAX одного чата. PendingIntent нельзя сохранить
- * на диск — кнопка живёт только в памяти процесса, после его перезапуска нужно новое
- * уведомление из этого чата.
+ * на диск — кнопка живёт в памяти процесса, а её копия — в тихом уведомлении приложения
+ * (ReplyBackup), откуда она восстанавливается после перезапуска процесса.
  */
 class ReplyButton(
     val chatName: String,
@@ -72,6 +72,8 @@ object ReplyPrefs {
     private const val KEY_CHAT_NAME = "chat_name"
     private const val KEY_CHANNEL_ID = "channel_id"
     private const val KEY_NOTIFICATION_ID = "notification_id"
+    private const val KEY_OUTAGE_SINCE = "outage_since"
+    private const val KEY_OUTAGE_MISSED = "outage_missed"
 
     data class Target(val chatName: String, val channelId: String, val notificationId: Int)
 
@@ -89,6 +91,32 @@ object ReplyPrefs {
             .putString(KEY_CHANNEL_ID, button.channelId)
             .putInt(KEY_NOTIFICATION_ID, button.notificationId)
             .apply()
+    }
+
+    /**
+     * Перерыв в передаче: время первого неотправленного показания и сколько их подряд не ушло.
+     * Хранится на диске — перерыв обычно и случается из-за перезапуска процесса.
+     */
+    data class Outage(val sinceMs: Long, val missed: Int)
+
+    fun getOutage(context: Context): Outage? {
+        val p = prefs(context)
+        val missed = p.getInt(KEY_OUTAGE_MISSED, 0)
+        if (missed == 0) return null
+        return Outage(p.getLong(KEY_OUTAGE_SINCE, 0L), missed)
+    }
+
+    fun recordMissed(context: Context, readingTimeMs: Long) {
+        val p = prefs(context)
+        val missed = p.getInt(KEY_OUTAGE_MISSED, 0)
+        p.edit().apply {
+            if (missed == 0) putLong(KEY_OUTAGE_SINCE, readingTimeMs)
+            putInt(KEY_OUTAGE_MISSED, missed + 1)
+        }.apply()
+    }
+
+    fun clearOutage(context: Context) {
+        prefs(context).edit().remove(KEY_OUTAGE_SINCE).remove(KEY_OUTAGE_MISSED).apply()
     }
 
     /**

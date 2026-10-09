@@ -147,6 +147,7 @@ class MainActivity : AppCompatActivity() {
             .setPositiveButton("Да") { _, _ ->
                 ReplyPrefs.setTarget(this, button)
                 ReplyState.target = button
+                ReplyBackup.save(this, button)
                 ReplyState.blockedBy = null
                 Prefs.appendLog(this, "Выбран чат «${button.chatName}» (${button.kind}, канал ${button.channelId}, id=${button.notificationId})")
                 ReadingSender.updateStatus(this)
@@ -246,7 +247,7 @@ class MainActivity : AppCompatActivity() {
         val stamp = android.text.format.DateFormat.format("yyyy-MM-dd_HH-mm", System.currentTimeMillis())
         val file = File(dir, "bg2max-reply-log_$stamp.txt")
         file.writeText(
-            "BG2MAX Ответ v${BuildConfig.VERSION_NAME}, ${Build.MANUFACTURER} ${Build.MODEL}, Android ${Build.VERSION.RELEASE}\n\n" +
+            "BG2MAX v${BuildConfig.VERSION_NAME}, ${Build.MANUFACTURER} ${Build.MODEL}, Android ${Build.VERSION.RELEASE}\n\n" +
                 Prefs.getFullLog(this)
         )
         val uri = FileProvider.getUriForFile(this, "$packageName.logs", file)

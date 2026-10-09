@@ -24,7 +24,15 @@ object ReadingSender {
     /** Отложенное показание старше этого уже не отправляем — придёт следующее. */
     private const val PENDING_MAX_AGE_MS = 10 * 60_000L
 
-    private class Pending(val text: String, val summary: String, val readingTimeMs: Long)
+    /**
+     * Подтверждение «передача возобновлена» уходит, только если подряд не ушло столько показаний
+     * (≈15 минут): короткие сбои не стоят лишнего сообщения в семейном чате.
+     */
+    private const val RESUME_NOTICE_MIN_MISSED = 3
+
+    private enum class Kind { READING, TEST, NOTICE }
+
+    private class Pending(val text: String, val summary: String, val readingTimeMs: Long, val kind: Kind)
 
     private var pending: Pending? = null
 
@@ -33,36 +41,67 @@ object ReadingSender {
 
     @Synchronized
     fun send(context: Context, text: String, summary: String, readingTimeMs: Long) {
-        trySend(context, Pending(text, summary, readingTimeMs), keepIfUndelivered = true)
+        trySend(context, Pending(text, summary, readingTimeMs, Kind.READING), keepIfUndelivered = true)
     }
 
     /** Тестовое сообщение: не откладывается, результат сразу виден в журнале. */
     @Synchronized
     fun sendTest(context: Context, text: String): Boolean =
-        trySend(context, Pending(text, "тестовое сообщение", System.currentTimeMillis()), keepIfUndelivered = false)
+        trySend(context, Pending(text, "тестовое сообщение", System.currentTimeMillis(), Kind.TEST), keepIfUndelivered = false)
 
     /** Вызывается слушателем уведомлений, когда получена кнопка ответа выбранного чата. */
     @Synchronized
     fun onButtonCaptured(context: Context) {
         val waiting = pending
-        if (waiting == null) {
-            updateStatus(context)
-            return
-        }
         pending = null
-        val ageMin = (System.currentTimeMillis() - waiting.readingTimeMs) / 60_000
-        if (ageMin * 60_000 > PENDING_MAX_AGE_MS) {
+        if (waiting != null) {
+            val ageMin = (System.currentTimeMillis() - waiting.readingTimeMs) / 60_000
+            if (ageMin * 60_000 <= PENDING_MAX_AGE_MS) {
+                // Подтверждение о возобновлении (если был перерыв) уйдёт первой строкой этого сообщения.
+                Prefs.appendLog(context, "Отправляю отложенное показание ($ageMin мин назад)")
+                trySend(context, waiting, keepIfUndelivered = false)
+                return
+            }
             Prefs.appendLog(context, "Отложенное показание (${waiting.summary}) устарело на $ageMin мин — не отправляю")
-            updateStatus(context)
+        }
+        // Показания для отправки нет — сообщаем о возобновлении сразу, не дожидаясь следующего,
+        // чтобы написавший в чат увидел, что это сработало.
+        val outage = ReplyPrefs.getOutage(context)
+        if (outage != null && outage.missed >= RESUME_NOTICE_MIN_MISSED) {
+            val notice = resumeNotice(outage) + " Следующее показание придёт в течение 5 минут."
+            trySend(context, Pending(notice, "подтверждение о возобновлении", System.currentTimeMillis(), Kind.NOTICE),
+                keepIfUndelivered = false)
             return
         }
-        Prefs.appendLog(context, "Отправляю отложенное показание ($ageMin мин назад)")
-        trySend(context, waiting, keepIfUndelivered = false)
+        updateStatus(context)
+    }
+
+    /** «✅ Передача возобновлена. Показания не приходили с 23:28 (пропущено 112).» */
+    private fun resumeNotice(outage: ReplyPrefs.Outage): String {
+        val sameDay = android.text.format.DateUtils.isToday(outage.sinceMs)
+        val since = android.text.format.DateFormat.format(if (sameDay) "HH:mm" else "dd.MM HH:mm", outage.sinceMs)
+        return "✅ Передача возобновлена. Показания не приходили с $since (пропущено ${outage.missed})."
+    }
+
+    /**
+     * Кнопка ответа: из памяти, а после перезапуска процесса — из сохранённой копии
+     * (ReplyBackup). null — кнопки нет, нужно новое сообщение из чата.
+     */
+    @Synchronized
+    fun currentButton(context: Context): ReplyButton? {
+        ReplyState.target?.let { return it }
+        val restored = ReplyBackup.restore(context) ?: return null
+        ReplyState.target = restored
+        val ageMin = (System.currentTimeMillis() - restored.capturedAt) / 60_000
+        Prefs.appendLog(context, "Кнопка ответа «${restored.chatName}» восстановлена после перезапуска " +
+            "(получена $ageMin мин назад)")
+        ReplyState.changed()
+        return restored
     }
 
     private fun trySend(context: Context, item: Pending, keepIfUndelivered: Boolean): Boolean {
         val wanted = ReplyPrefs.getTarget(context)
-        val button = ReplyState.target
+        val button = currentButton(context)
         val blockedBy = ReplyState.blockedBy
         val problem = when {
             wanted == null -> "чат не выбран"
@@ -73,14 +112,21 @@ object ReadingSender {
         }
         if (problem != null) {
             if (keepIfUndelivered) pending = item
+            if (item.kind == Kind.READING) ReplyPrefs.recordMissed(context, item.readingTimeMs)
             Prefs.appendLog(context, "НЕ отправлено (${item.summary}): $problem; ${deviceState(context)}")
             updateStatus(context)
             return false
         }
         button!!
 
+        // После перерыва первое показание несёт строку о возобновлении.
+        val outage = if (item.kind == Kind.READING) ReplyPrefs.getOutage(context) else null
+        val text = if (outage != null && outage.missed >= RESUME_NOTICE_MIN_MISSED) {
+            resumeNotice(outage) + "\n\n" + item.text
+        } else item.text
+
         val results = Bundle()
-        button.remoteInputs.forEach { results.putCharSequence(it.resultKey, item.text) }
+        button.remoteInputs.forEach { results.putCharSequence(it.resultKey, text) }
         val fillIn = Intent()
         RemoteInput.addResultsToIntent(button.remoteInputs, fillIn, results)
         if (Build.VERSION.SDK_INT >= 28) RemoteInput.setResultsSource(fillIn, RemoteInput.SOURCE_FREE_FORM_INPUT)
@@ -89,6 +135,13 @@ object ReadingSender {
         return try {
             button.pendingIntent.send(context, 0, fillIn)
             lastSentAt = System.currentTimeMillis()
+            if (item.kind != Kind.TEST) {
+                ReplyPrefs.getOutage(context)?.let {
+                    Prefs.appendLog(context, "Передача возобновлена после перерыва: пропущено ${it.missed} показаний" +
+                        if (it.missed >= RESUME_NOTICE_MIN_MISSED) ", в чат отправлено подтверждение" else "")
+                }
+                ReplyPrefs.clearOutage(context)
+            }
             Prefs.appendLog(context, "Передано в MAX → «${button.chatName}»: ${item.summary} " +
                 "(кнопке $buttonAgeMin мин; ${deviceState(context)})")
             updateStatus(context)
@@ -96,7 +149,9 @@ object ReadingSender {
         } catch (e: PendingIntent.CanceledException) {
             // MAX отменил кнопку — до нового уведомления из чата отправлять нечем.
             if (ReplyState.target === button) ReplyState.target = null
+            ReplyBackup.clear(context)
             if (keepIfUndelivered) pending = item
+            if (item.kind == Kind.READING) ReplyPrefs.recordMissed(context, item.readingTimeMs)
             Prefs.appendLog(context, "НЕ отправлено (${item.summary}): MAX отменил кнопку ответа " +
                 "(ей было $buttonAgeMin мин); ${deviceState(context)}")
             updateStatus(context)
@@ -112,7 +167,7 @@ object ReadingSender {
             wanted == null -> "⚠ Чат для показаний не выбран — откройте приложение"
             ReplyState.blockedBy != null ->
                 "⚠ Отправка остановлена. Нужно новое сообщение в MAX из чата «${wanted.chatName}»"
-            ReplyState.target == null ->
+            currentButton(context) == null ->
                 "⚠ Нет связи с чатом «${wanted.chatName}». Нужно новое сообщение в MAX из этого чата"
             lastSentAt == 0L -> "Готов отправлять показания в «${wanted.chatName}»"
             else -> "Последнее показание передано в «${wanted.chatName}» в " +

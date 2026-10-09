@@ -31,8 +31,8 @@ android {
             dimension = "transport"
             applicationIdSuffix = ".reply"
             // Своя нумерация: вариант экспериментальный, выпускается отдельно от bot.
-            versionCode = 2
-            versionName = "0.1.1"
+            versionCode = 3
+            versionName = "0.1.2"
         }
     }
 
@@ -58,13 +58,15 @@ android {
     }
 }
 
-// APK с вариантом и номером версии в имени: bg2max-bot-1.1.0-debug.apk, bg2max-reply-0.1.0-debug.apk
+// Имя APK с номером версии. Основной вариант — reply: bg2max-0.1.2-debug.apk;
+// bot оставлен для экспериментов: bg2max-bot-1.1.0-debug.apk.
 @Suppress("DEPRECATION")
 android.applicationVariants.all {
     val variant = this
+    val prefix = if (variant.flavorName == "reply") "bg2max" else "bg2max-${variant.flavorName}"
     outputs.all {
         (this as com.android.build.gradle.internal.api.BaseVariantOutputImpl).outputFileName =
-            "bg2max-${variant.flavorName}-${variant.versionName}-${variant.buildType.name}.apk"
+            "$prefix-${variant.versionName}-${variant.buildType.name}.apk"
     }
 }
 

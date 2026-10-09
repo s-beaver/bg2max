@@ -19,7 +19,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="BG2MAX Ответ"
+                android:text="BG2MAX"
                 android:textSize="24sp"
                 android:textStyle="bold" />
 
@@ -135,7 +135,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="На Xiaomi: для BG2MAX Ответ и для MAX включите «Автозапуск» и в «Контроле активности» выберите «Нет ограничений»."
+            android:text="На Xiaomi: для BG2MAX и для MAX включите «Автозапуск» и в «Контроле активности» выберите «Нет ограничений»."
             android:textSize="12sp"
             android:textColor="#666666" />
 

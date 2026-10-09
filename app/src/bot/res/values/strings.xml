@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Экспериментальный вариант с ботом MAX: своё имя, чтобы не путать с основным BG2MAX на одном телефоне. -->
+<resources>
+    <string name="app_name">BG2MAX Бот</string>
+</resources>
