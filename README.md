@@ -101,6 +101,21 @@ Copyright © 2026 Sergey Efremov
 
 APK появятся в `app/build/outputs/apk/reply/debug/bg2max-<версия>-debug.apk` и `app/build/outputs/apk/bot/debug/bg2max-bot-<версия>-debug.apk`.
 
+### Release-сборка
+
+APK для пользователей подписывается постоянным ключом автора: Android ставит обновление поверх, только если оно подписано тем же ключом. Ключ и пароли в репозиторий не попадают (`keystore.properties`, `*.jks`, `*.keystore` — в `.gitignore`).
+
+1. Один раз создать ключ (keytool есть в Android Studio, `jbr/bin`), пароли он спросит сам:
+   ```
+   keytool -genkeypair -v -keystore C:/Users/<вы>/keys/bg2max-release.jks -alias bg2max -keyalg RSA -keysize 4096 -validity 10000
+   ```
+2. Скопировать `keystore.properties.example` в `keystore.properties` в корне проекта (или в любое место и указать путь в переменной окружения `BG2MAX_SIGNING`) и вписать путь к ключу и пароли.
+3. Собрать: `./gradlew assembleReplyRelease` → `app/build/outputs/apk/reply/release/bg2max-<версия>.apk`. Без ключа получится `bg2max-<версия>-unsigned.apk` — на телефон он не встанет.
+
+**Ключ и пароли хранить в 2–3 надёжных местах.** Потерянный ключ — обновления для установленных приложений выпустить уже нельзя, всем придётся удалять приложение и ставить заново. Утёкший — кто-то сможет выпустить поддельное «обновление».
+
+Переход с debug-сборки на release один раз требует удалить приложение и поставить заново: подписи разные. После этого снова дать доступ к уведомлениям и выбрать чат.
+
 ## Версии
 
 История изменений — в [CHANGELOG.md](CHANGELOG.md). Текущая версия видна в заголовке приложения.

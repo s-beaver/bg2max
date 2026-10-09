@@ -1,7 +1,18 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
 }
+
+// Ключ release-подписи — вне репозитория. Путь к файлу с его настройками: переменная окружения
+// BG2MAX_SIGNING, иначе keystore.properties в корне проекта (он в .gitignore).
+// Образец — keystore.properties.example. Без файла release-сборка получается неподписанной.
+val signingProps = Properties().apply {
+    val file = System.getenv("BG2MAX_SIGNING")?.let { File(it) } ?: rootProject.file("keystore.properties")
+    if (file.exists()) file.inputStream().use { load(it) }
+}
+val hasReleaseKey = signingProps.getProperty("storeFile") != null
 
 android {
     namespace = "com.bg2max.app"
@@ -18,9 +29,10 @@ android {
     }
 
     // Два варианта приложения из одного кода (общий код — src/main):
-    //  bot   — отправка через MAX Bot API, нужен свой бот и его токен (src/bot);
-    //  reply — отправка кнопкой «Ответить» из уведомления MAX от имени аккаунта
-    //          на этом телефоне, без бота, токена и доступа в интернет (src/reply).
+    //  reply — основной вариант «BG2MAX»: отправка кнопкой «Ответить» из уведомления MAX
+    //          от имени аккаунта на этом телефоне, без бота, токена и интернета (src/reply);
+    //  bot   — «BG2MAX Бот», для экспериментов: отправка через MAX Bot API, нужен свой бот
+    //          и его токен (src/bot).
     // Разные applicationId — оба можно поставить на один телефон.
     flavorDimensions += "transport"
     productFlavors {
@@ -30,14 +42,26 @@ android {
         create("reply") {
             dimension = "transport"
             applicationIdSuffix = ".reply"
-            // Своя нумерация: вариант экспериментальный, выпускается отдельно от bot.
+            // Своя нумерация, отдельно от bot.
             versionCode = 3
             versionName = "0.1.2"
         }
     }
 
+    signingConfigs {
+        if (hasReleaseKey) {
+            create("release") {
+                storeFile = file(signingProps.getProperty("storeFile"))
+                storePassword = signingProps.getProperty("storePassword")
+                keyAlias = signingProps.getProperty("keyAlias")
+                keyPassword = signingProps.getProperty("keyPassword")
+            }
+        }
+    }
+
     buildTypes {
         release {
+            if (hasReleaseKey) signingConfig = signingConfigs.getByName("release")
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
@@ -58,15 +82,20 @@ android {
     }
 }
 
-// Имя APK с номером версии. Основной вариант — reply: bg2max-0.1.2-debug.apk;
-// bot оставлен для экспериментов: bg2max-bot-1.1.0-debug.apk.
+// Имя APK с номером версии. Основной вариант — reply: bg2max-0.1.2.apk (release),
+// bg2max-0.1.2-debug.apk; bot оставлен для экспериментов: bg2max-bot-1.1.0-debug.apk.
+// Release без ключа — bg2max-0.1.2-unsigned.apk: такой файл на телефон не установится.
 @Suppress("DEPRECATION")
 android.applicationVariants.all {
     val variant = this
     val prefix = if (variant.flavorName == "reply") "bg2max" else "bg2max-${variant.flavorName}"
     outputs.all {
         (this as com.android.build.gradle.internal.api.BaseVariantOutputImpl).outputFileName =
-            "$prefix-${variant.versionName}-${variant.buildType.name}.apk"
+            when {
+                variant.buildType.name != "release" -> "$prefix-${variant.versionName}-${variant.buildType.name}.apk"
+                hasReleaseKey -> "$prefix-${variant.versionName}.apk"
+                else -> "$prefix-${variant.versionName}-unsigned.apk"
+            }
     }
 }
 
