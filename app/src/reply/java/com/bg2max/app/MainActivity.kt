@@ -110,6 +110,7 @@ class MainActivity : AppCompatActivity() {
         binding.textLastReading.text = Prefs.getLastReadingText(this)
         binding.textLog.text = Prefs.getLog(this)
         binding.textAapsDump.text = Prefs.getLastAapsDumpText(this)
+        MessageOptionsView.refreshAaps(binding.messageOptions, this)
     }
 
     private fun hasListenerAccess() =

@@ -127,6 +127,7 @@ class GlucoseForwardService : Service() {
         }
         ContextCompat.registerReceiver(this, receiver, filter, ContextCompat.RECEIVER_EXPORTED)
         Prefs.appendLog(applicationContext, "Сервис v${BuildConfig.VERSION_NAME} запущен, ожидаю данные от xDrip+")
+        ExitReasons.logNew(applicationContext)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int = START_STICKY

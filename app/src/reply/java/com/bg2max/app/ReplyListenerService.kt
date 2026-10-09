@@ -46,6 +46,35 @@ class ReplyListenerService : NotificationListenerService() {
         if (sbn.packageName == MAX_PACKAGE) process(sbn, "новое")
     }
 
+    /**
+     * Кто убрал уведомление выбранного чата. Если оно остаётся в шторке, после перезапуска
+     * процесса кнопка восстанавливается из неё (см. onListenerConnected) — а по журналу
+     * 08–09.10 в шторке к моменту перезапуска ничего не было.
+     */
+    override fun onNotificationRemoved(sbn: StatusBarNotification, rankingMap: RankingMap, reason: Int) {
+        if (sbn.packageName != MAX_PACKAGE) return
+        val n = sbn.notification
+        if (n.flags and Notification.FLAG_GROUP_SUMMARY != 0) return
+        val chatName = (n.extras.getCharSequence(Notification.EXTRA_CONVERSATION_TITLE)
+            ?: n.extras.getCharSequence(Notification.EXTRA_TITLE))?.toString().orEmpty()
+        val wanted = ReplyPrefs.getTarget(this) ?: return
+        if (chatName != wanted.chatName && sbn.id != wanted.notificationId) return
+        Prefs.appendLog(this, "MAX: уведомление «$chatName», id=${sbn.id} убрано из шторки — ${removalReason(reason)}")
+    }
+
+    private fun removalReason(reason: Int): String = when (reason) {
+        REASON_CLICK -> "нажали на уведомление"
+        REASON_CANCEL -> "смахнули"
+        REASON_CANCEL_ALL -> "«очистить все»"
+        REASON_APP_CANCEL, REASON_APP_CANCEL_ALL -> "убрал сам MAX (например, чат прочитан или отправлен ответ)"
+        REASON_GROUP_SUMMARY_CANCELED -> "убрана вся группа уведомлений"
+        REASON_PACKAGE_CHANGED, REASON_PACKAGE_BANNED -> "MAX обновлён или уведомления MAX отключены"
+        REASON_LISTENER_CANCEL, REASON_LISTENER_CANCEL_ALL -> "убрал слушатель уведомлений"
+        REASON_TIMEOUT -> "истёк срок показа"
+        REASON_USER_STOPPED -> "MAX остановлен"
+        else -> "причина $reason"
+    }
+
     private fun process(sbn: StatusBarNotification, event: String) {
         val n = sbn.notification
         if (n.flags and Notification.FLAG_GROUP_SUMMARY != 0) return
@@ -76,6 +105,10 @@ class ReplyListenerService : NotificationListenerService() {
             return
         }
 
+        if (button.channelId != wanted.channelId) {
+            Prefs.appendLog(this, "MAX ($event): «$chatName» пришло на канал ${button.channelId} " +
+                "(при выборе был ${wanted.channelId}) — чат опознан по id уведомления ${sbn.id}")
+        }
         if (wanted.notificationId != 0 && wanted.notificationId != sbn.id) {
             // Проверяем, постоянен ли id уведомления у чата (идея — опознавать чат по нему, а не по имени).
             Prefs.appendLog(this, "ВНИМАНИЕ: у «$chatName» id уведомления ${sbn.id}, а при выборе чата был ${wanted.notificationId}")

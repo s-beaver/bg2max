@@ -57,4 +57,80 @@
         android:layout_height="wrap_content"
         android:text="Возраст сенсора (дни)" />
 
+    <!-- Блок виден, только если от AndroidAPS хоть раз приходили данные
+         (или галочка из него уже включена) — см. MessageOptionsView.refreshAaps. -->
+    <LinearLayout
+        android:id="@+id/aapsOptions"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="Из AndroidAPS"
+        android:textStyle="bold" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:layout_marginBottom="4dp"
+        android:text="Если данные от AndroidAPS старше 10 минут, эти строки не добавляются"
+        android:textSize="12sp"
+        android:textColor="#666666" />
+
+    <TextView
+        android:id="@+id/textAapsReceived"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="4dp"
+        android:textSize="12sp" />
+
+    <CheckBox
+        android:id="@+id/checkboxIob"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Активный инсулин (IOB)" />
+
+    <CheckBox
+        android:id="@+id/checkboxCob"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Активные углеводы (COB)" />
+
+    <CheckBox
+        android:id="@+id/checkboxReservoir"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Остаток инсулина в помпе" />
+
+    <CheckBox
+        android:id="@+id/checkboxPumpBattery"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Заряд батареи помпы" />
+
+    <CheckBox
+        android:id="@+id/checkboxPhoneBattery"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Заряд батареи телефона" />
+
+    <CheckBox
+        android:id="@+id/checkboxProfile"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Профиль AAPS" />
+
+    <CheckBox
+        android:id="@+id/checkboxPumpStatus"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Последняя связь с помпой и последний болюс" />
+
+    </LinearLayout>
+
 </LinearLayout>

@@ -91,7 +91,14 @@ object ReplyPrefs {
             .apply()
     }
 
-    /** Тот ли это чат: имя совпадает точно, и тип (личный/группа) тоже. */
+    /**
+     * Тот ли это чат: имя совпадает точно, и тип (личный/группа) тоже. Канал у одного чата
+     * бывает разный: 09.10.2026 сообщение из группы пришло на «ru.oneme.app.inapp.2» вместо
+     * «ru.oneme.app.chats» — тогда признаём чат по id уведомления, он у чата постоянный
+     * (у группы весь вечер и утро был 378, у личного чата — свой, 948723002).
+     */
     fun matches(target: Target, button: ReplyButton): Boolean =
-        button.chatName == target.chatName && button.channelId == target.channelId
+        button.chatName == target.chatName &&
+            (button.channelId == target.channelId ||
+                (target.notificationId != 0 && button.notificationId == target.notificationId))
 }

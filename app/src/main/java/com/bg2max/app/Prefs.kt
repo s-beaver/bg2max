@@ -16,12 +16,20 @@ object Prefs {
     private const val KEY_AAPS_DUMP = "aaps_dump"
     private const val KEY_AAPS_DUMP_TIME = "aaps_dump_time"
     private const val KEY_DISCLAIMER_VERSION = "disclaimer_accepted_version"
+    private const val KEY_LAST_EXIT_LOGGED = "last_exit_logged"
     private const val KEY_INCLUDE_DELTA = "include_delta"
     private const val KEY_INCLUDE_RATE = "include_rate"
     private const val KEY_INCLUDE_NOISE = "include_noise"
     private const val KEY_INCLUDE_BATTERY = "include_battery"
     private const val KEY_INCLUDE_SOURCE = "include_source"
     private const val KEY_INCLUDE_SENSOR_AGE = "include_sensor_age"
+    private const val KEY_INCLUDE_IOB = "include_iob"
+    private const val KEY_INCLUDE_COB = "include_cob"
+    private const val KEY_INCLUDE_RESERVOIR = "include_reservoir"
+    private const val KEY_INCLUDE_PUMP_BATTERY = "include_pump_battery"
+    private const val KEY_INCLUDE_PHONE_BATTERY = "include_phone_battery"
+    private const val KEY_INCLUDE_PROFILE = "include_profile"
+    private const val KEY_INCLUDE_PUMP_STATUS = "include_pump_status"
     private const val LOG_FILE = "bg2max.log"
     private const val LOG_FILE_MAX_BYTES = 1_000_000L
 
@@ -32,7 +40,15 @@ object Prefs {
         val includeNoise: Boolean,
         val includeBattery: Boolean,
         val includeSource: Boolean,
-        val includeSensorAge: Boolean
+        val includeSensorAge: Boolean,
+        // Из AndroidAPS: без AAPS (или при устаревших данных) эти строки не выводятся.
+        val includeIob: Boolean = false,
+        val includeCob: Boolean = false,
+        val includeReservoir: Boolean = false,
+        val includePumpBattery: Boolean = false,
+        val includePhoneBattery: Boolean = false,
+        val includeProfile: Boolean = false,
+        val includePumpStatus: Boolean = false
     )
 
     private fun prefs(context: Context) =
@@ -144,6 +160,12 @@ object Prefs {
         prefs(context).edit().putInt(KEY_DISCLAIMER_VERSION, version).apply()
     }
 
+    /** Время последней записанной в журнал гибели процесса — чтобы не писать её повторно. */
+    fun getLastExitLogged(context: Context): Long = prefs(context).getLong(KEY_LAST_EXIT_LOGGED, 0L)
+    fun setLastExitLogged(context: Context, value: Long) {
+        prefs(context).edit().putLong(KEY_LAST_EXIT_LOGGED, value).apply()
+    }
+
     fun getLog(context: Context): String = prefs(context).getString(KEY_LOG, "") ?: ""
 
     fun getMessageOptions(context: Context): MessageOptions {
@@ -154,7 +176,14 @@ object Prefs {
             includeNoise = p.getBoolean(KEY_INCLUDE_NOISE, false),
             includeBattery = p.getBoolean(KEY_INCLUDE_BATTERY, false),
             includeSource = p.getBoolean(KEY_INCLUDE_SOURCE, false),
-            includeSensorAge = p.getBoolean(KEY_INCLUDE_SENSOR_AGE, false)
+            includeSensorAge = p.getBoolean(KEY_INCLUDE_SENSOR_AGE, false),
+            includeIob = p.getBoolean(KEY_INCLUDE_IOB, false),
+            includeCob = p.getBoolean(KEY_INCLUDE_COB, false),
+            includeReservoir = p.getBoolean(KEY_INCLUDE_RESERVOIR, false),
+            includePumpBattery = p.getBoolean(KEY_INCLUDE_PUMP_BATTERY, false),
+            includePhoneBattery = p.getBoolean(KEY_INCLUDE_PHONE_BATTERY, false),
+            includeProfile = p.getBoolean(KEY_INCLUDE_PROFILE, false),
+            includePumpStatus = p.getBoolean(KEY_INCLUDE_PUMP_STATUS, false)
         )
     }
 
@@ -166,6 +195,13 @@ object Prefs {
             .putBoolean(KEY_INCLUDE_BATTERY, options.includeBattery)
             .putBoolean(KEY_INCLUDE_SOURCE, options.includeSource)
             .putBoolean(KEY_INCLUDE_SENSOR_AGE, options.includeSensorAge)
+            .putBoolean(KEY_INCLUDE_IOB, options.includeIob)
+            .putBoolean(KEY_INCLUDE_COB, options.includeCob)
+            .putBoolean(KEY_INCLUDE_RESERVOIR, options.includeReservoir)
+            .putBoolean(KEY_INCLUDE_PUMP_BATTERY, options.includePumpBattery)
+            .putBoolean(KEY_INCLUDE_PHONE_BATTERY, options.includePhoneBattery)
+            .putBoolean(KEY_INCLUDE_PROFILE, options.includeProfile)
+            .putBoolean(KEY_INCLUDE_PUMP_STATUS, options.includePumpStatus)
             .apply()
     }
 }

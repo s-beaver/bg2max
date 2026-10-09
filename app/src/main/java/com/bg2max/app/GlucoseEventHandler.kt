@@ -19,7 +19,8 @@ object GlucoseEventHandler {
         val arrow = GlucoseUtils.trendArrow(reading.trendName)
         Prefs.setLastReading(context, reading.mgdl, mmol, arrow, reading.timestampMs)
 
-        val text = GlucoseUtils.formatMessage(reading, Prefs.getMessageOptions(context))
+        val aaps = AapsStatus.loadFresh(context, System.currentTimeMillis())
+        val text = GlucoseUtils.formatMessage(reading, Prefs.getMessageOptions(context), aaps)
         // Способ отправки свой у каждого варианта приложения: src/bot или src/reply.
         ReadingSender.send(context, text, "%.1f ммоль/л %s".format(mmol, arrow), reading.timestampMs)
     }

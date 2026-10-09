@@ -12,14 +12,23 @@ import android.util.Log
  * получателей через queryBroadcastReceivers и шлёт каждому адресно, динамически
  * зарегистрированный приёмник он не найдёт.
  *
- * Пока только диагностика: сохраняем последний пакет целиком, чтобы увидеть на
- * реальном телефоне, какие поля приходят, и пишем в журнал краткую строку.
+ * Сохраняем разобранный статус для сообщения (AapsStatus), последний пакет целиком —
+ * для диагностики на главном экране, и пишем в журнал краткую строку.
  */
 class AapsStatusReceiver : BroadcastReceiver() {
 
     companion object {
         const val ACTION_AAPS_STATUS = "info.nightscout.androidaps.status"
         private const val TAG = "bg2max.aaps"
+
+        /** AAPS шлёт пакет по нескольку раз в минуту — одинаковые строки в журнал не пишем. */
+        private const val REPEAT_LOG_INTERVAL_MS = 10 * 60_000L
+
+        @Volatile
+        private var lastLogged: String? = null
+
+        @Volatile
+        private var lastLoggedAt = 0L
     }
 
     override fun onReceive(context: Context, intent: Intent) {
@@ -28,26 +37,24 @@ class AapsStatusReceiver : BroadcastReceiver() {
 
         val dump = dumpExtras(extras)
         Log.d(TAG, dump)
-        Prefs.setLastAapsDump(context, System.currentTimeMillis(), dump)
-        Prefs.appendLog(context, "AAPS: " + summary(extras))
+        val now = System.currentTimeMillis()
+        Prefs.setLastAapsDump(context, now, dump)
+        AapsStatus.save(context, AapsStatus.fromExtras(extras, now))
+        val line = "AAPS: " + summary(extras)
+        if (line != lastLogged || now - lastLoggedAt > REPEAT_LOG_INTERVAL_MS) {
+            lastLogged = line
+            lastLoggedAt = now
+            Prefs.appendLog(context, line)
+        }
     }
 
     private fun summary(extras: Bundle): String {
         val parts = mutableListOf<String>()
-        numberOf(extras, "iob")?.let { parts += "IOB %.2f Ед".format(it) }
-        numberOf(extras, "cob")?.takeIf { it >= 0 }?.let { parts += "COB %.0f г".format(it) }
+        AapsStatus.number(extras, "iob")?.let { parts += "IOB %.2f Ед".format(it) }
+        AapsStatus.number(extras, "cob")?.takeIf { it >= 0 }?.let { parts += "COB %.0f г".format(it) }
         if (parts.isEmpty()) parts += "пакет без IOB/COB, полей: ${extras.size()}"
         return parts.joinToString(", ")
     }
-
-    /** Тип поля заранее неизвестен (Double/Int/String) — берём как есть. */
-    private fun numberOf(extras: Bundle, key: String): Double? =
-        @Suppress("DEPRECATION")
-        when (val v = extras.get(key)) {
-            is Number -> v.toDouble()
-            is String -> v.toDoubleOrNull()
-            else -> null
-        }
 
     @Suppress("DEPRECATION")
     private fun dumpExtras(extras: Bundle): String =
