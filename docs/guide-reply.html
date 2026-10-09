@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>BG2MAX Ответ — пошаговая инструкция</title>
+<!-- Исходник bg2max-reply-guide.pdf. Пересобрать PDF:
+     chrome --headless --print-to-pdf=bg2max-reply-guide.pdf --no-pdf-header-footer docs/guide-reply.html -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bitter:wght@600;700&family=Onest:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+  /* Лист инструкции: узкая колонка с номерами шагов на левом поле — как bg2max-guide.pdf */
+  :root {
+    --paper: #F3F5F4;
+    --ink: #1D2A26;
+    --text: #44524D;
+    --muted: #7A8782;
+    --accent: #1F6B5C;
+    --purple: #5B4597;
+    --note-bg: #F7E9D7;
+    --note-line: #E3C9A4;
+    --note-ink: #B4621B;
+    --chip: #E6ECE9;
+    --card: #FFFFFF;
+    --rule: #DCE3E0;
+    --display: "Bitter", Georgia, serif;
+    --body: "Onest", "Segoe UI", Roboto, sans-serif;
+    --mono: "JetBrains Mono", Consolas, monospace;
+  }
+  @page { size: A4; margin: 14mm 0; }
+  * { box-sizing: border-box; }
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body { margin: 0; background: var(--paper); color: var(--text); font: 15px/1.65 var(--body); }
+  .sheet { max-width: 800px; margin: 0 auto; padding: 32px 36px 40px; }
+  h1, h2, h3 { font-family: var(--display); color: var(--ink); text-wrap: balance; }
+  h1 { font-size: 40px; line-height: 1.12; margin: 6px 0 16px; }
+  h2 { font-size: 21px; margin: 0; }
+  h3 { font-family: var(--body); font-size: 15px; font-weight: 600; margin: 18px 0 6px; }
+  .eyebrow { font: 600 11px var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+  .lead { font-size: 16.5px; max-width: 60ch; }
+  b, strong { color: var(--ink); font-weight: 600; }
+  code, .chip { font: 500 12.5px var(--mono); background: var(--chip); border: 1px solid var(--rule); border-radius: 5px; padding: 1px 6px; color: var(--ink); white-space: nowrap; }
+  .chip { font-family: var(--body); font-size: 13px; }
+  .path { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 8px 0; color: var(--muted); }
+  pre.code { font: 500 13px var(--mono); background: var(--chip); border: 1px solid var(--rule); border-radius: 6px; padding: 6px 10px; display: inline-block; margin: 4px 0; color: var(--ink); }
+
+  .flow { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; gap: 14px; align-items: center; margin: 26px 0 18px; }
+  .flow .box { background: var(--card); border-radius: 10px; border-top: 3px solid var(--accent); box-shadow: 0 1px 4px rgba(29,42,38,.12); padding: 14px 16px; }
+  .flow .box:nth-of-type(2) { border-top-color: #7A8782; }
+  .flow .box:nth-of-type(3) { border-top-color: var(--purple); }
+  .flow .box .eyebrow { color: var(--accent); }
+  .flow .box:nth-of-type(3) .eyebrow { color: var(--purple); }
+  .flow .box b { display: block; font: 700 17px var(--display); margin: 4px 0; }
+  .flow .box p { margin: 0; font-size: 13.5px; line-height: 1.5; }
+  .flow .arr { color: var(--muted); }
+
+  ul.need { list-style: none; padding: 0; margin: 0 0 10px; display: grid; gap: 8px; }
+  ul.need li { padding-left: 22px; position: relative; }
+  ul.need li::before { content: "✓"; position: absolute; left: 0; color: var(--accent); font-weight: 700; }
+
+  .step { display: grid; grid-template-columns: 64px 1fr; gap: 0 16px; margin-top: 34px; break-inside: auto; }
+  .step .n { font: 700 28px/1 var(--display); color: var(--accent); padding-top: 2px; }
+  .step .body { min-width: 0; }
+  .step .body > h2 { margin-bottom: 10px; }
+  .step p { margin: 8px 0; }
+  ol { padding-left: 22px; margin: 8px 0; }
+  ol li { margin: 6px 0; }
+
+  .note { background: var(--note-bg); border: 1px solid var(--note-line); border-radius: 8px; padding: 12px 16px; margin: 14px 0; break-inside: avoid; }
+  .note .eyebrow { color: var(--note-ink); display: block; margin-bottom: 4px; }
+  .note p { margin: 4px 0; }
+  .note.key { background: #FBE9E7; border-color: #EBC1BC; }
+  .note.key .eyebrow { color: #B71C1C; }
+
+  table.opts { width: 100%; border-collapse: separate; border-spacing: 0; background: var(--card); border: 1px solid var(--rule); border-radius: 8px; overflow: hidden; margin: 10px 0; font-size: 14px; break-inside: avoid; }
+  table.opts td, table.opts th { padding: 9px 14px; text-align: left; vertical-align: top; border-top: 1px solid var(--rule); }
+  table.opts tr:first-child th, table.opts tr:first-child td { border-top: 0; }
+  table.opts th { font: 600 11px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); background: #F7F9F8; }
+  table.opts td:first-child { font-weight: 600; color: var(--ink); width: 38%; }
+
+  .chat { background: #E8EDEB; border-radius: 10px; padding: 14px 18px 16px; margin: 12px 0; break-inside: avoid; }
+  .chat .who { font: 500 11px var(--mono); color: var(--muted); }
+  .bubble { background: var(--card); border-radius: 12px; padding: 10px 14px; margin-top: 6px; display: inline-block; font-size: 14px; line-height: 1.6; box-shadow: 0 1px 2px rgba(0,0,0,.08); color: #222; }
+  .bubble small { color: var(--muted); }
+  .arrows { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 13px; margin-top: 10px; color: var(--text); }
+
+  .faq { margin-top: 44px; break-before: page; }
+  .faq h2 { font-size: 26px; margin-bottom: 8px; }
+  .faq dl { margin: 0; }
+  .faq dt { font-weight: 600; color: var(--ink); padding-top: 14px; border-top: 1px solid var(--rule); margin-top: 14px; }
+  .faq dd { margin: 4px 0 0; }
+  footer { margin-top: 36px; padding-top: 14px; border-top: 1px solid var(--rule); font-size: 12.5px; color: var(--muted); }
+</style>
+</head>
+<body>
+<div class="sheet">
+
+<div class="eyebrow">Пошаговая инструкция · BG2MAX Ответ 0.1</div>
+<h1>Показания глюкозы — в чат MAX, без бота</h1>
+<p class="lead">BG2MAX Ответ берёт свежие показания из xDrip+ и отвечает ими в выбранный чат MAX — так же, как вы сами отвечаете на сообщение прямо из шторки уведомлений. Сообщения уходят от имени аккаунта MAX на этом телефоне. Не нужны ни бот, ни ИП или самозанятость, ни токен. Настройка — минут 10.</p>
+
+<div class="flow">
+  <div class="box"><span class="eyebrow">Источник</span><b>xDrip+</b><p>сенсор каждые 5 минут присылает новое значение</p></div>
+  <span class="arr">→</span>
+  <div class="box"><span class="eyebrow">Почтальон</span><b>BG2MAX Ответ</b><p>оформляет сообщение и нажимает «Ответить» в уведомлении MAX</p></div>
+  <span class="arr">→</span>
+  <div class="box"><span class="eyebrow">Куда приходит</span><b>Чат MAX</b><p>личный чат или семейная группа — от вашего аккаунта</p></div>
+</div>
+
+<ul class="need">
+  <li><b>Телефон на Android 8 или новее</b> — тот, на котором уже работает xDrip+ (обычно это телефон ребёнка)</li>
+  <li><b>MAX на этом же телефоне</b> — вход выполнен; показания будут приходить от этого аккаунта</li>
+  <li><b>Чат с получателями</b> — личный чат с родителем или семейная группа, где этот аккаунт состоит</li>
+  <li><b>Файл <code>bg2max-reply-0.1.1.apk</code></b> — тот, что вам передали</li>
+  <li><b>AndroidAPS</b> — необязательно; если он есть, в сообщение можно добавить инсулин, углеводы и данные помпы</li>
+</ul>
+
+<section class="step"><div class="n">01</div><div class="body">
+  <h2>Установите приложение</h2>
+  <p>Скопируйте файл на телефон и откройте его. Android спросит разрешение ставить приложения «из неизвестных источников» — для этого файла его можно дать.</p>
+  <p>При первом запуске приложение покажет отказ от ответственности. Прочитайте его: BG2MAX Ответ — не медицинское изделие, и без согласия он не откроется.</p>
+  <div class="note"><span class="eyebrow">Xiaomi, Redmi, POCO (HyperOS)</span>
+    <p>На этих телефонах доступ к уведомлениям (шаг 3) для приложения, установленного из файла, бывает заблокирован без возможности его разрешить. Если так вышло — удалите BG2MAX Ответ и поставьте его заново через приложение <b>SAI (Split APKs Installer)</b> из Google Play или RuStore.</p>
+  </div>
+</div></section>
+
+<section class="step"><div class="n">02</div><div class="body">
+  <h2>Разрешите xDrip+ делиться показаниями</h2>
+  <p>Откройте xDrip+ и пройдите по пути:</p>
+  <div class="path"><span class="chip">Настройки</span>→<span class="chip">Настройки интеграций с приложениями</span>→<span class="chip">Локальная трансляция данных</span></div>
+  <p>Включите трансляцию. Поле <b>«Установить получателя»</b> можно оставить пустым — тогда показания получат все приложения на телефоне. Или впишите:</p>
+  <pre class="code">com.bg2max.app.reply</pre>
+  <div class="note"><span class="eyebrow">Если у вас уже есть AndroidAPS</span>
+    <p>В поле, скорее всего, уже написано <code>info.nightscout.androidaps</code> — не стирайте это, иначе AAPS перестанет получать данные. Допишите наш пакет <b>через пробел на той же строке</b>, не нажимая Enter:</p>
+    <pre class="code">info.nightscout.androidaps com.bg2max.app.reply</pre>
+    <p>После ввода проверьте, что клавиатура не сделала первую букву заглавной.</p>
+  </div>
+</div></section>
+
+<section class="step"><div class="n">03</div><div class="body">
+  <h2>Дайте доступ к уведомлениям</h2>
+  <p>Так приложение увидит уведомления MAX и кнопку «Ответить» в них. Текст чужих сообщений оно не сохраняет и никуда не пересылает.</p>
+  <ol>
+    <li>В BG2MAX Ответ нажмите <b>«Открыть настройки доступа»</b>.</li>
+    <li>Найдите в списке <b>BG2MAX Ответ</b> и включите переключатель.</li>
+  </ol>
+  <div class="note"><span class="eyebrow">Переключатель серый, Android пишет «Ограниченная настройка»</span>
+    <p>Откройте Настройки → Приложения → BG2MAX Ответ → меню ⋮ в правом верхнем углу → <b>«Разрешить ограниченные настройки»</b>, затем повторите шаг. Если такого пункта нет (Xiaomi) — переустановите через SAI, см. шаг 1.</p>
+  </div>
+</div></section>
+
+<section class="step"><div class="n">04</div><div class="body">
+  <h2>Выберите чат для показаний</h2>
+  <ol>
+    <li>Попросите получателя написать на этот телефон любое сообщение в MAX. Для семейной группы — пусть кто-нибудь напишет в группу.</li>
+    <li>Дождитесь уведомления MAX и нажмите в BG2MAX Ответ <b>«Выбрать чат»</b>.</li>
+    <li>Выберите чат в списке и подтвердите <b>«Отправлять в …?»</b>.</li>
+  </ol>
+  <p>Показания уходят <b>только в этот чат</b> — даже если в шторке есть уведомления из других. Их увидят все участники чата.</p>
+  <div class="note"><span class="eyebrow">Чтобы всё работало</span>
+    <p>Этот чат на телефоне не должен быть «без звука», а уведомления MAX должны быть включены. Без уведомления у приложения нет кнопки «Ответить».</p>
+  </div>
+</div></section>
+
+<section class="step"><div class="n">05</div><div class="body">
+  <h2>Выберите, что писать в сообщении</h2>
+  <p>Значение глюкозы, стрелка тренда и время отправляются всегда. Остальное — галочками:</p>
+  <table class="opts">
+    <tr><th colspan="2">Из xDrip+</th></tr>
+    <tr><td>Изменение (дельта)</td><td>на сколько изменилось с прошлого показания</td></tr>
+    <tr><td>Скорость изменения</td><td>насколько быстро растёт или падает, в ммоль/л в минуту</td></tr>
+    <tr><td>Шум сигнала</td><td>предупреждение, если датчик сейчас работает нестабильно</td></tr>
+    <tr><td>Заряд батареи сенсора</td><td>только если xDrip+ его знает</td></tr>
+    <tr><td>Источник данных</td><td>откуда xDrip+ берёт показания</td></tr>
+    <tr><td>Возраст сенсора</td><td>какой день носится сенсор — если xDrip+ знает дату установки</td></tr>
+  </table>
+  <table class="opts">
+    <tr><th colspan="2">Из AndroidAPS</th></tr>
+    <tr><td>Активный инсулин (IOB)</td><td>сколько инсулина ещё действует</td></tr>
+    <tr><td>Активные углеводы (COB)</td><td>сколько углеводов ещё усваивается</td></tr>
+    <tr><td>Остаток инсулина в помпе</td><td>резервуар, Ед</td></tr>
+    <tr><td>Заряд батареи помпы и телефона</td><td>в процентах</td></tr>
+    <tr><td>Профиль AAPS</td><td>например «Основной(150%)»</td></tr>
+    <tr><td>Связь с помпой и последний болюс</td><td>сколько минут назад AAPS связывался с помпой; доза и время болюса</td></tr>
+  </table>
+  <div class="note"><span class="eyebrow">Блок «Из AndroidAPS» не виден?</span>
+    <p>Он появляется, когда от AAPS придут первые данные. В AAPS откройте <b>Конфигуратор → Синхронизация</b> и включите модуль <b>Samsung Tizen</b> (в новых версиях — <b>Data Broadcaster</b>). Под заголовком блока видно время последних данных. Если они старше 10 минут, строки AAPS в сообщение не добавляются, чтобы не отправить устаревшие цифры.</p>
+  </div>
+  <p>Нажмите <b>«Сохранить настройки сообщения»</b>.</p>
+</div></section>
+
+<section class="step"><div class="n">06</div><div class="body">
+  <h2>Проверьте и включите трансляцию</h2>
+  <ol>
+    <li>Нажмите <b>«Отправить тестовое сообщение»</b> и посмотрите в чат MAX — сообщение должно появиться через несколько секунд.</li>
+    <li>Нажмите <b>«Симулировать показание»</b> — придёт пример сообщения с выбранными строками.</li>
+    <li>Включите переключатель <b>«Транслировать в MAX»</b>. Теперь каждое новое показание будет уходить в чат.</li>
+  </ol>
+  <div class="chat">
+    <div class="who">так выглядит сообщение с xDrip+ и AAPS</div>
+    <div class="bubble">🩸 Глюкоза: 6,7 ммоль/л ↘<br>Δ Изменение: −0,3 ммоль/л за 5 мин<br>📉 Скорость: −0,06 ммоль/л/мин<br>💉 Активный инсулин: 1,83 Ед<br>🍞 Активные углеводы: 5 г<br>🧪 Резервуар помпы: 230 Ед<br>📶 Связь с помпой: 7 мин назад<br>🕒 19:23</div>
+    <div class="arrows"><span>⇈ быстро растёт</span><span>↑ растёт</span><span>↗ немного растёт</span><span>→ стабильно</span><span>↘ немного падает</span><span>↓ падает</span><span>⇊ быстро падает</span></div>
+  </div>
+</div></section>
+
+<section class="step"><div class="n">07</div><div class="body">
+  <h2>Защитите приложение от выгрузки</h2>
+  <p>Пока трансляция включена, в шторке висит уведомление BG2MAX Ответ — в нём видно, всё ли в порядке. Но телефон может выгрузить приложение ради экономии батареи. Поэтому:</p>
+  <ol>
+    <li>Нажмите <b>«Отключить оптимизацию батареи»</b> и разрешите.</li>
+    <li>Нажмите <b>«Настройки приложения (автозапуск)»</b>. На Xiaomi включите <b>«Автозапуск»</b>, а в «Контроле активности» выберите <b>«Нет ограничений»</b>.</li>
+    <li>То же сделайте <b>для самого MAX</b> — без него сообщение не отправится.</li>
+    <li>Закрепите BG2MAX Ответ в списке недавних приложений (на Xiaomi — потяните карточку вниз, появится замок) и не смахивайте его.</li>
+  </ol>
+  <div class="note"><span class="eyebrow">Не знаете, где эти пункты</span>
+    <p>Они называются по-разному на разных телефонах. Наберите в поиске «[модель телефона] автозапуск приложений» или откройте dontkillmyapp.com — там шаги для каждого производителя.</p>
+  </div>
+</div></section>
+
+<div class="note key"><span class="eyebrow">Главное, что нужно знать</span>
+  <p>Приложение отвечает кнопкой из уведомления MAX, а эту кнопку нельзя сохранить. Если телефон перезагрузился или выгрузил приложение, отправка встаёт, пока <b>в выбранный чат не придёт новое сообщение</b>. В уведомлении BG2MAX Ответ тогда написано: <b>«⚠ Нет связи с чатом … Нужно новое сообщение в MAX из этого чата»</b>.</p>
+  <p>Что делать: попросите любого участника чата написать что-нибудь. Как только уведомление придёт, показания снова пойдут. Последнее непереданное показание уйдёт сразу, если ему меньше 10 минут.</p>
+</div>
+
+<section class="faq">
+  <h2>Если что-то пошло не так</h2>
+  <dl>
+    <dt>«Выбрать чат» пишет, что уведомлений MAX не было</dt>
+    <dd>Проверьте, что доступ к уведомлениям включён (шаг 3) и что после этого в чат пришло новое сообщение. Уведомления, пришедшие до включения доступа, приложение не видит.</dd>
+    <dt>Ночью показания перестали приходить</dt>
+    <dd>Почти всегда телефон выгрузил приложение — см. «Главное, что нужно знать» и шаг 7. Утром напишите в чат, и отправка возобновится. Перешлите журнал разработчику кнопкой «Поделиться журналом»: в нём видна причина остановки.</dd>
+    <dt>«Отправка остановлена: у другого чата та же кнопка ответа»</dt>
+    <dd>Это защита: ответ мог бы уйти не в тот чат, поэтому приложение его не отправляет. Попросите написать в выбранный чат — отправка продолжится.</dd>
+    <dt>В журнале «Передано в MAX», а в чате сообщения нет</dt>
+    <dd>«Передано» значит, что кнопка нажата; дальше сообщение отправляет MAX. Откройте MAX на этом телефоне: проверьте интернет и нет ли у сообщения значка ошибки.</dd>
+    <dt>Можно ли слать и в личный чат, и в группу?</dt>
+    <dd>Нет, только в один выбранный чат. Удобнее всего завести семейную группу и выбрать её.</dd>
+    <dt>Где «Батарея сенсора» и «Возраст сенсора»?</dt>
+    <dd>Если сенсор читает другое приложение, xDrip+ этих данных не знает, и строки не выводятся. AndroidAPS их тоже не передаёт.</dd>
+  </dl>
+</section>
+
+<footer>BG2MAX Ответ работает только на вашем телефоне: без облака и своих серверов. Сообщения отправляет приложение MAX от вашего аккаунта, их видят все участники выбранного чата. BG2MAX — не медицинское изделие: не принимайте по его сообщениям решений о лечении.</footer>
+
+</div>
+</body>
+</html>
