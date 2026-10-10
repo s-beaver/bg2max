@@ -142,6 +142,9 @@
                 color: var(--ink);
                 padding: 1px 6px;
                 border-radius: 5px;
+                /* без лигатур: иначе «-<» в bg2max-<версия> рисуется стрелкой */
+                font-variant-ligatures: none;
+                white-space: nowrap;
             }
 
             /* шапка */
@@ -491,6 +494,72 @@
                 color: var(--ink);
             }
 
+            /* скачивание: крупные, явно нажимаемые кнопки-файлы */
+            .downloads {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 14px;
+                margin-top: 28px;
+            }
+            .dl {
+                display: flex;
+                align-items: center;
+                gap: 14px;
+                min-width: 0;
+                flex: 0 1 300px;
+                padding: 14px 20px 14px 14px;
+                border-radius: 16px;
+                border: 1.5px solid var(--ink);
+                background: var(--surface);
+                color: var(--ink);
+                text-decoration: none;
+            }
+            .dl:hover {
+                transform: translateY(-1px);
+            }
+            .dl-icon {
+                flex: none;
+                width: 46px;
+                height: 54px;
+                border-radius: 6px 14px 6px 6px;
+                display: grid;
+                place-items: end center;
+                padding-bottom: 8px;
+                font: 700 11px var(--mono);
+                letter-spacing: 0.06em;
+                background: var(--sunken);
+                color: var(--ink);
+            }
+            .dl-text {
+                display: grid;
+                gap: 2px;
+                min-width: 0;
+            }
+            .dl-text b {
+                font: 600 var(--s3) / 1.25 var(--body);
+            }
+            .dl-text small {
+                font-size: var(--s1);
+                color: var(--muted);
+            }
+            .dl.primary {
+                background: var(--red);
+                border-color: var(--red);
+                color: #fff;
+            }
+            .dl.primary .dl-icon {
+                background: #fff;
+                color: #b71c1c;
+            }
+            .dl.primary .dl-text small {
+                color: rgba(255, 255, 255, 0.85);
+            }
+            @media (max-width: 680px) {
+                .dl {
+                    flex-basis: 100%;
+                }
+            }
+
             /* поддержка проекта: спокойный блок, без давления */
             .support .intro {
                 max-width: 62ch;
@@ -569,6 +638,7 @@
                 }
             }
             @media (prefers-reduced-motion: reduce) {
+                .dl:hover,
                 .btn:hover {
                     transform: none;
                 }
@@ -1008,24 +1078,45 @@
                     <h2 style="margin-top: 12px">
                         10–15 минут на телефоне ребёнка
                     </h2>
+                    <!-- Прямые ссылки на файлы последнего релиза: инструкция скачивается сразу,
+                         без страницы GitHub. Имя файла в релизе должно оставаться bg2max-guide.pdf. -->
+                    <div class="downloads">
+                        <a
+                            class="dl primary"
+                            href="https://github.com/s-beaver/bg2max/releases/latest/download/bg2max-guide.pdf"
+                            download
+                        >
+                            <span class="dl-icon" aria-hidden="true">PDF</span>
+                            <span class="dl-text"
+                                ><b>Скачать инструкцию</b
+                                ><small>6 страниц, 0,5 МБ</small></span
+                            >
+                        </a>
+                        <a
+                            class="dl"
+                            href="https://github.com/s-beaver/bg2max/releases/latest"
+                        >
+                            <span class="dl-icon" aria-hidden="true">APK</span>
+                            <span class="dl-text"
+                                ><b>Скачать приложение</b
+                                ><small>последняя версия на GitHub</small></span
+                            >
+                        </a>
+                    </div>
                     <ol>
                         <li>
                             <span
-                                ><b>Скачайте инструкцию</b> с картинками шагов:
-                                <a
-                                    href="https://github.com/s-beaver/bg2max/blob/main/bg2max-guide.pdf"
-                                    >PDF, 6 страниц</a
-                                >.</span
+                                ><b>Прочитайте инструкцию</b>: в ней каждый шаг
+                                настройки по порядку и что делать, если что-то
+                                пошло не так.</span
                             >
                         </li>
                         <li>
                             <span
-                                ><b>Установите APK.</b> Файл
-                                <code>bg2max-&lt;версия&gt;.apk</code> — в
-                                <a
-                                    href="https://github.com/s-beaver/bg2max/releases/latest"
-                                    >последнем релизе на GitHub</a
-                                >.</span
+                                ><b>Установите приложение.</b> На странице
+                                релиза скачайте файл
+                                <code>bg2max-&lt;версия&gt;.apk</code> и
+                                откройте его на телефоне ребёнка.</span
                             >
                         </li>
                         <li>

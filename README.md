@@ -125,6 +125,10 @@ APK для пользователей подписывается постоян�
 1. В `app/build.gradle.kts` увеличить `versionCode` на 1 и поднять `versionName` (у варианта `reply` — свои `versionCode`/`versionName` в блоке `productFlavors`) (SemVer: исправление → `1.1.1`, новая возможность → `1.2.0`).
 2. Перенести пункты из раздела «Не выпущено» в `CHANGELOG.md` под новый номер с датой.
 3. Закоммитить и поставить тег: `git tag v1.2.0 && git push --tags`.
+4. Создать релиз на GitHub и приложить `bg2max-<версия>.apk` (release-сборка) и **`bg2max-guide.pdf` под этим же именем**: кнопка «Скачать инструкцию» на лендинге ведёт на `releases/latest/download/bg2max-guide.pdf`, то есть на этот файл в последнем релизе.
+   ```
+   gh release create v1.2.0 --title "BG2MAX 1.2.0" --notes-file <заметки>.md app/build/outputs/apk/reply/release/bg2max-1.2.0.apk bg2max-guide.pdf
+   ```
 
 ## Стек
 
