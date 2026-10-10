@@ -188,7 +188,8 @@
             /* первый экран */
             .hero {
                 display: grid;
-                grid-template-columns: 1.1fr 0.9fr;
+                /* minmax(0, …): колонка не растягивается под широкое содержимое на узком экране */
+                grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
                 gap: 56px;
                 align-items: center;
                 padding-block: 36px 72px;
@@ -242,7 +243,7 @@
                 font-weight: 700;
             }
 
-            /* скриншот настоящего сообщения: показываем в натуральную величину, без растяжения */
+            /* настоящее сообщение в рамке чата; на узком экране сжимается до ширины колонки */
             .shot {
                 margin: 0;
                 justify-self: end;
@@ -251,13 +252,14 @@
                 border-radius: 26px;
                 padding: 22px;
                 display: grid;
+                grid-template-columns: minmax(0, 366px);
                 gap: 14px;
                 max-width: 100%;
+                min-width: 0;
             }
             /* настоящее сообщение — текстом, как пузырь в чате */
             .shot .msg {
-                width: 366px;
-                max-width: 100%;
+                min-width: 0;
                 font-size: 16px;
                 line-height: 1.55;
                 padding: 12px 16px 8px;
@@ -520,7 +522,7 @@
 
             @media (max-width: 900px) {
                 .hero {
-                    grid-template-columns: 1fr;
+                    grid-template-columns: minmax(0, 1fr);
                     gap: 40px;
                     padding-top: 16px;
                 }
@@ -528,7 +530,7 @@
                     justify-self: start;
                 }
                 .builder {
-                    grid-template-columns: 1fr;
+                    grid-template-columns: minmax(0, 1fr);
                 }
                 .preview {
                     position: static;
@@ -536,7 +538,7 @@
             }
             @media (max-width: 680px) {
                 .flow {
-                    grid-template-columns: 1fr;
+                    grid-template-columns: minmax(0, 1fr);
                     gap: 24px;
                 }
                 .flow > div,
@@ -546,13 +548,24 @@
                 }
                 .groups,
                 .two {
-                    grid-template-columns: 1fr;
+                    grid-template-columns: minmax(0, 1fr);
                 }
                 nav.links {
                     display: none;
                 }
+                .shot {
+                    padding: 14px;
+                    border-radius: 20px;
+                }
                 section.block {
                     padding-block: 48px;
+                }
+            }
+            /* телефоны уже 400 px: строки сообщения помещаются без переносов, как в самом MAX */
+            @media (max-width: 400px) {
+                .shot .msg {
+                    font-size: 13.5px;
+                    padding: 10px 12px 6px;
                 }
             }
             @media (prefers-reduced-motion: reduce) {
@@ -714,7 +727,9 @@
 
                 <section class="block" id="account">
                     <div class="label">Без бота и без серверов</div>
-                    <h2 style="margin-top: 12px">Как это работает</h2>
+                    <h2 style="margin-top: 12px">
+                        Как отправляются показатели глюкозы
+                    </h2>
                     <div class="two">
                         <div>
                             <p class="intro" style="margin-top: 0">
