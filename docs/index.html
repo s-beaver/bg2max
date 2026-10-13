@@ -560,6 +560,51 @@
                 }
             }
 
+            /* видео настройки рядом с шагами; на узком экране встаёт над ними */
+            .setup {
+                display: grid;
+                grid-template-columns: minmax(0, 1fr) 300px;
+                gap: 40px;
+                align-items: start;
+                margin-top: 28px;
+            }
+            .setup ol {
+                margin-top: 0;
+            }
+            .video {
+                order: 2;
+                margin: 0;
+                display: grid;
+                gap: 12px;
+                min-width: 0;
+            }
+            /* запись экрана телефона: вертикальный кадр 9:16 */
+            .video video {
+                display: block;
+                width: 100%;
+                aspect-ratio: 9 / 16;
+                border-radius: 20px;
+                border: 1px solid var(--rule);
+                background: #000;
+            }
+            .video figcaption {
+                font-size: 12.5px;
+                color: var(--muted);
+            }
+            .video figcaption a {
+                color: inherit;
+            }
+            @media (max-width: 900px) {
+                .setup {
+                    grid-template-columns: minmax(0, 1fr);
+                    gap: 28px;
+                }
+                .video {
+                    order: 0;
+                    max-width: 300px;
+                }
+            }
+
             /* поддержка проекта: спокойный блок, без давления */
             /* частые вопросы: раскрывающиеся пункты, работают без скриптов */
             .faq-list {
@@ -743,6 +788,9 @@
                         <div class="cta">
                             <a class="btn primary" href="#start"
                                 >Как установить</a
+                            >
+                            <a class="btn" href="#video"
+                                >Видео: настройка за 4&nbsp;минуты</a
                             >
                             <a
                                 class="btn"
@@ -1145,47 +1193,74 @@
                             >
                         </a>
                     </div>
-                    <ol>
-                        <li>
-                            <span
-                                ><b>Прочитайте инструкцию</b>: в ней каждый шаг
-                                настройки по порядку и что делать, если что-то
-                                пошло не так.</span
+                    <div class="setup">
+                        <!-- Видео лежит в репозитории (docs/bg2max-setup.webm) и отдаётся прямо с GitHub:
+                             страница остаётся одним файлом. При замене ролика имя файла не менять. -->
+                        <figure class="video" id="video">
+                            <video
+                                controls
+                                playsinline
+                                preload="none"
+                                poster="https://raw.githubusercontent.com/s-beaver/bg2max/main/docs/bg2max-setup-poster.png"
                             >
-                        </li>
-                        <li>
-                            <span
-                                ><b>Установите приложение.</b> На странице
-                                релиза скачайте файл
-                                <code>bg2max-&lt;версия&gt;.apk</code> и
-                                откройте его на телефоне ребёнка.</span
-                            >
-                        </li>
-                        <li>
-                            <span
-                                ><b>Включите в xDrip+ локальную трансляцию</b>:
-                                Настройки → Настройки интеграций с приложениями
-                                → Локальная трансляция данных.</span
-                            >
-                        </li>
-                        <li>
-                            <span
-                                ><b
-                                    >Дайте доступ к уведомлениям и выберите
-                                    чат</b
-                                >: пусть кто-нибудь напишет в семейный чат,
-                                затем нажмите «Выбрать чат». Отметьте строки
-                                сообщения и отправьте тестовое.</span
-                            >
-                        </li>
-                        <li>
-                            <span
-                                ><b>Разрешите работу в фоне</b>: без ограничений
-                                батареи и с автозапуском, иначе телефон выгрузит
-                                приложение ночью.</span
-                            >
-                        </li>
-                    </ol>
+                                <source
+                                    src="https://raw.githubusercontent.com/s-beaver/bg2max/main/docs/bg2max-setup.webm"
+                                    type="video/webm"
+                                />
+                            </video>
+                            <figcaption>
+                                Настройка BG2MAX от начала до конца, 4&nbsp;минуты.
+                                Не запускается?
+                                <a href="https://raw.githubusercontent.com/s-beaver/bg2max/main/docs/bg2max-setup.webm"
+                                    >Скачать видео</a
+                                >
+                                (27&nbsp;МБ).
+                            </figcaption>
+                        </figure>
+                        <ol>
+                            <li>
+                                <span
+                                    ><b>Посмотрите видео или прочитайте
+                                    инструкцию</b
+                                    >: в них каждый шаг настройки по порядку, а
+                                    в инструкции ещё и что делать, если что-то
+                                    пошло не так.</span
+                                >
+                            </li>
+                            <li>
+                                <span
+                                    ><b>Установите приложение.</b> На странице
+                                    релиза скачайте файл
+                                    <code>bg2max-&lt;версия&gt;.apk</code> и
+                                    откройте его на телефоне ребёнка.</span
+                                >
+                            </li>
+                            <li>
+                                <span
+                                    ><b>Включите в xDrip+ локальную трансляцию</b>:
+                                    Настройки → Настройки интеграций с приложениями
+                                    → Локальная трансляция данных.</span
+                                >
+                            </li>
+                            <li>
+                                <span
+                                    ><b
+                                        >Дайте доступ к уведомлениям и выберите
+                                        чат</b
+                                    >: пусть кто-нибудь напишет в семейный чат,
+                                    затем нажмите «Выбрать чат». Отметьте строки
+                                    сообщения и отправьте тестовое.</span
+                                >
+                            </li>
+                            <li>
+                                <span
+                                    ><b>Разрешите работу в фоне</b>: без ограничений
+                                    батареи и с автозапуском, иначе телефон выгрузит
+                                    приложение ночью.</span
+                                >
+                            </li>
+                        </ol>
+                    </div>
                 </section>
 
                 <section class="block faq" id="faq">

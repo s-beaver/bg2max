@@ -20,6 +20,7 @@
 Инструкции для пользователей, без технических подробностей:
 - [`bg2max-guide.pdf`](bg2max-guide.pdf) — BG2MAX (исходник — [`docs/guide.html`](docs/guide.html));
 - [`bg2max-bot-guide.pdf`](bg2max-bot-guide.pdf) — BG2MAX Бот.
+- [`docs/bg2max-setup.webm`](docs/bg2max-setup.webm) — видео «Настройка BG2MAX» (4 минуты); лендинг показывает его прямо из репозитория, поэтому имя и путь файла менять нельзя.
 
 Страница проекта для сайта — [`docs/index.html`](docs/index.html).
 
