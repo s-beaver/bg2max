@@ -53,6 +53,11 @@
   .flow .box p { margin: 0; font-size: 13.5px; line-height: 1.5; }
   .flow .arr { color: var(--muted); }
 
+  .scheme { margin: 22px 0; break-inside: avoid; }
+  .scheme .scroll { overflow-x: auto; border: 1px solid var(--rule); border-radius: 8px; background: var(--card); }
+  .scheme svg { display: block; width: 100%; min-width: 640px; height: auto; }
+  .scheme figcaption { font-size: 13px; color: var(--muted); margin-top: 8px; }
+
   ul.need { list-style: none; padding: 0; margin: 0 0 10px; display: grid; gap: 8px; }
   ul.need li { padding-left: 22px; position: relative; }
   ul.need li::before { content: "✓"; position: absolute; left: 0; color: var(--accent); font-weight: 700; }
@@ -97,7 +102,7 @@
 <div class="eyebrow">Пошаговая инструкция · BG2MAX 0.1</div>
 <h1>Показания глюкозы — в чат MAX, без бота</h1>
 <div class="note key"><span class="eyebrow">Обязательное условие</span>
-  <p><b>Работает только в одном случае: телефон ребёнка на Android, и на нём установлен xDrip+.</b> На iPhone и без xDrip+ BG2MAX работать не будет.</p>
+  <p><b>Работает только в одном случае: телефон ребёнка на Android, на нём установлен xDrip+ и MAX.</b> У родителей могут быть любые устройства, на которых работает MAX.</p>
 </div>
 <p class="lead">BG2MAX берёт свежие показания из xDrip+ и отвечает ими в выбранный чат MAX — так же, как вы сами отвечаете на сообщение прямо из шторки уведомлений. Сообщения уходят от имени аккаунта MAX на этом телефоне. Не нужны ни бот, ни ИП или самозанятость, ни токен. Настройка — минут 10.</p>
 
@@ -108,6 +113,107 @@
   <span class="arr">→</span>
   <div class="box"><span class="eyebrow">Куда приходит</span><b>Чат MAX</b><p>личный чат или семейная группа — от вашего аккаунта</p></div>
 </div>
+
+<figure class="scheme">
+  <div class="scroll">
+    <svg xmlns="http://www.w3.org/2000/svg" class="df" viewBox="0 -60 960 360" role="img" aria-label="Сенсор передаёт показания в xDrip+ напрямую или через приложение сенсора. xDrip+ рассылает их только AndroidAPS и BG2MAX и загружает глюкозу в облако Nightscout. AndroidAPS загружает в Nightscout инсулин, углеводы и состояние помпы, а BG2MAX передаёт IOB и COB. BG2MAX отвечает в уведомлении MAX, и сообщение уходит в чат семьи. Nightscout — конечная точка: из него ничего не возвращается в xDrip+ или AndroidAPS.">
+      <style>
+        .df { font-family: "Golos Text", "Onest", "Segoe UI", Roboto, system-ui, sans-serif; }
+        .df .df-bg { fill: #ffffff; }
+        .df .df-box { fill: #ffffff; stroke: #c9d3dc; stroke-width: 1.5; }
+        .df .df-key { stroke: #1f6fb2; stroke-width: 2; fill: #e6f0f9; }
+        .df .df-opt { stroke-dasharray: 5 4; }
+        .df .df-cloud { stroke: #1f6fb2; stroke-width: 2; stroke-dasharray: 2 3; }
+        .df .df-t { fill: #17212b; font-size: 14px; font-weight: 600; }
+        .df .df-s { fill: #5a6875; font-size: 11.5px; }
+        .df .df-m { fill: #5a6875; font-size: 11px; font-family: "JetBrains Mono", Consolas, monospace; }
+        .df .df-flow { fill: none; stroke: #1f6fb2; stroke-width: 2; }
+        .df .df-thin { stroke: #5a6875; stroke-width: 1.5; }
+        .df .df-lbl { fill: #1f6fb2; font-size: 11.5px; font-weight: 500; }
+        .df .df-dim { fill: #5a6875; }
+        .df .df-head-ok { fill: #1f6fb2; }
+        .df .df-head-dim { fill: #5a6875; }
+      </style>
+      <defs>
+        <marker id="df-ah-ok" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="df-head-ok"/></marker>
+        <marker id="df-ah-dim" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="df-head-dim"/></marker>
+      </defs>
+
+      <rect class="df-bg" x="0" y="-60" width="960" height="360" rx="8"/>
+
+      <!-- Сенсор -->
+      <rect class="df-box" x="20" y="110" width="120" height="60" rx="6"/>
+      <text class="df-t" x="80" y="137" text-anchor="middle">Сенсор</text>
+      <text class="df-s" x="80" y="155" text-anchor="middle">Dexcom, Libre…</text>
+
+      <!-- Приложение сенсора (необязательно) -->
+      <rect class="df-box df-opt" x="170" y="220" width="160" height="62" rx="6"/>
+      <text class="df-t" x="250" y="246" text-anchor="middle">Приложение сенсора</text>
+      <text class="df-s" x="250" y="264" text-anchor="middle">Juggluco, LibreLink…</text>
+
+      <!-- xDrip+ -->
+      <rect class="df-box df-key" x="360" y="100" width="150" height="80" rx="6"/>
+      <text class="df-t" x="435" y="132" text-anchor="middle">xDrip+</text>
+      <text class="df-s" x="435" y="150" text-anchor="middle">единственный вход</text>
+      <text class="df-s" x="435" y="165" text-anchor="middle">показаний</text>
+
+      <!-- AndroidAPS -->
+      <rect class="df-box" x="590" y="28" width="160" height="72" rx="6"/>
+      <text class="df-t" x="670" y="58" text-anchor="middle">AndroidAPS</text>
+      <text class="df-s" x="670" y="76" text-anchor="middle">источник ГК: xDrip+</text>
+
+      <!-- BG2MAX -->
+      <rect class="df-box df-key" x="590" y="180" width="160" height="72" rx="6"/>
+      <text class="df-t" x="670" y="210" text-anchor="middle">BG2MAX</text>
+      <text class="df-s" x="670" y="228" text-anchor="middle">только читает</text>
+
+      <!-- MAX -->
+      <rect class="df-box" x="810" y="180" width="130" height="72" rx="6"/>
+      <text class="df-t" x="875" y="210" text-anchor="middle">MAX</text>
+      <text class="df-s" x="875" y="228" text-anchor="middle">чат семьи</text>
+
+      <!-- Nightscout -->
+      <rect class="df-box df-cloud" x="810" y="28" width="130" height="72" rx="6"/>
+      <text class="df-t" x="875" y="58" text-anchor="middle">Nightscout</text>
+      <text class="df-s" x="875" y="76" text-anchor="middle">облако, конец пути</text>
+
+      <!-- xDrip+ → Nightscout: глюкозу загружает один xDrip+ -->
+      <path class="df-flow" d="M435 100 V-14 H875 V26" marker-end="url(#df-ah-ok)"/>
+      <text class="df-lbl" x="655" y="-21" text-anchor="middle">глюкоза: загружает только xDrip+</text>
+
+      <!-- AndroidAPS → Nightscout: лечение -->
+      <path class="df-flow df-thin" d="M750 64 H808" marker-end="url(#df-ah-dim)"/>
+      <text class="df-lbl df-dim" x="779" y="56" text-anchor="middle">лечение</text>
+
+      <!-- Сенсор → xDrip+ напрямую -->
+      <path class="df-flow" d="M140 140 H358" marker-end="url(#df-ah-ok)"/>
+      <text class="df-lbl" x="250" y="132" text-anchor="middle">напрямую</text>
+
+      <!-- Сенсор → приложение сенсора → xDrip+ -->
+      <path class="df-flow df-thin" d="M80 170 V251 H168" marker-end="url(#df-ah-dim)"/>
+      <path class="df-flow df-thin" d="M330 251 H435 V182" marker-end="url(#df-ah-dim)"/>
+      <text class="df-lbl df-dim" x="445" y="214">или одним</text>
+      <text class="df-lbl df-dim" x="445" y="229">путём через</text>
+      <text class="df-lbl df-dim" x="445" y="244">приложение</text>
+
+      <!-- xDrip+ → получатели -->
+      <path class="df-flow" d="M510 140 H550 V64 H588" marker-end="url(#df-ah-ok)"/>
+      <path class="df-flow" d="M550 140 V216 H588" marker-end="url(#df-ah-ok)"/>
+      <text class="df-m" x="557" y="120">BgEstimate</text>
+      <text class="df-s" x="557" y="135">по списку</text>
+
+      <!-- AndroidAPS → BG2MAX -->
+      <path class="df-flow df-thin" d="M670 100 V178" marker-end="url(#df-ah-dim)"/>
+      <text class="df-lbl df-dim" x="678" y="136">IOB, COB,</text>
+      <text class="df-lbl df-dim" x="678" y="151">помпа</text>
+
+      <!-- BG2MAX → MAX -->
+      <path class="df-flow" d="M750 216 H808" marker-end="url(#df-ah-ok)"/>
+      <text class="df-lbl" x="779" y="206" text-anchor="middle">ответ</text>
+    </svg>
+  </div>
+  <figcaption>Путь показаний на телефоне ребёнка. xDrip+ получает каждое показание один раз: от сенсора напрямую или через приложение сенсора, и передаёт его AndroidAPS и BG2MAX. Глюкозу в Nightscout загружает только xDrip+, AndroidAPS загружает туда только лечение и состояние помпы. BG2MAX ничего не отправляет ни в xDrip+, ни в AndroidAPS, ни в Nightscout.</figcaption>
+</figure>
 
 <ul class="need">
   <li><b>Телефон на Android 8 или новее</b> — тот, на котором уже работает xDrip+ (обычно это телефон ребёнка)</li>
@@ -130,12 +236,15 @@
   <h2>Разрешите xDrip+ делиться показаниями</h2>
   <p>Откройте xDrip+ и пройдите по пути:</p>
   <div class="path"><span class="chip">Настройки</span>→<span class="chip">Настройки интеграций с приложениями</span>→<span class="chip">Локальная трансляция данных</span></div>
-  <p>Включите трансляцию. Поле <b>«Установить получателя»</b> можно оставить пустым — тогда показания получат все приложения на телефоне. Или впишите:</p>
+  <p>Включите трансляцию. В поле <b>«Установить получателя»</b> впишите:</p>
   <pre class="code">com.bg2max.app.reply</pre>
   <div class="note"><span class="eyebrow">Если у вас уже есть AndroidAPS</span>
     <p>В поле, скорее всего, уже написано <code>info.nightscout.androidaps</code> — не стирайте это, иначе AAPS перестанет получать данные. Допишите наш пакет <b>через пробел на той же строке</b>, не нажимая Enter:</p>
     <pre class="code">info.nightscout.androidaps com.bg2max.app.reply</pre>
     <p>После ввода проверьте, что клавиатура не сделала первую букву заглавной.</p>
+  </div>
+  <div class="note"><span class="eyebrow">Не оставляйте поле пустым</span>
+    <p>С пустым полем xDrip+ рассылает показания всем приложениям на телефоне. Если какое-то из них умеет пересылать глюкозу обратно в xDrip+, на графике появятся дубли.</p>
   </div>
 </div></section>
 
