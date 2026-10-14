@@ -188,6 +188,35 @@
                 text-decoration-color: var(--red);
             }
 
+            /* обязательное условие над первым экраном */
+            .req {
+                display: flex;
+                align-items: flex-start;
+                gap: 14px;
+                margin-top: 6px;
+                padding: 16px 20px;
+                background: var(--red-soft);
+                border: 1.5px solid var(--red);
+                border-radius: 16px;
+                color: var(--ink);
+                font-size: var(--s3);
+                line-height: 1.45;
+            }
+            .req b {
+                font-weight: 600;
+            }
+            .req-mark {
+                flex: none;
+                display: grid;
+                place-items: center;
+                width: 28px;
+                height: 28px;
+                border-radius: 50%;
+                background: var(--red);
+                color: #fff;
+                font: 700 16px/1 var(--display);
+            }
+
             /* первый экран */
             .hero {
                 display: grid;
@@ -769,6 +798,18 @@
             </header>
 
             <main>
+                <!-- Главное условие — до всего остального, чтобы не ставили зря. -->
+                <p class="req" role="note">
+                    <span class="req-mark" aria-hidden="true">!</span>
+                    <span
+                        ><b
+                            >Работает только в одном случае: телефон ребёнка на
+                            Android, и на нём установлен xDrip+.</b
+                        >
+                        На iPhone и без xDrip+ BG2MAX работать не
+                        будет.</span
+                    >
+                </p>
                 <div class="hero">
                     <div>
                         <div class="label">
