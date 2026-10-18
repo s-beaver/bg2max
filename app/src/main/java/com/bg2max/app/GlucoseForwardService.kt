@@ -45,6 +45,25 @@ class GlucoseForwardService : Service() {
         /** xDrip хранит слоп в мг/дл в миллисекунду, переводим в мг/дл в минуту. */
         private const val SLOPE_MS_TO_MIN = 60_000.0
 
+        /** Сервис запущен в этом процессе — только тогда принимаются показания xDrip+. */
+        @Volatile
+        var running = false
+            private set
+
+        /**
+         * Запускает сервис, если трансляция включена, а он не работает. Приёмник xDrip+
+         * живёт внутри сервиса, поэтому без него показания теряются, хотя переключатель
+         * включён: 18.10.2026 после обновления до 0.3.0 Android остановил приложение,
+         * сервис сам не поднялся, AAPS (приёмник в манифесте) приходил, а xDrip+ — нет.
+         */
+        fun ensureRunning(context: Context, reason: String) {
+            if (running || !Prefs.isEnabled(context)) return
+            Prefs.appendLog(context, "Трансляция включена, но сервис не работал — запускаю ($reason)")
+            runCatching {
+                ContextCompat.startForegroundService(context, Intent(context, GlucoseForwardService::class.java))
+            }.onFailure { Prefs.appendLog(context, "Не удалось запустить сервис: ${it.message}") }
+        }
+
         /** Текст постоянного уведомления; null — стандартный. Переживает пересоздание сервиса. */
         @Volatile
         private var statusText: String? = null
@@ -126,6 +145,7 @@ class GlucoseForwardService : Service() {
             addAction(ACTION_STATUS_UPDATE)
         }
         ContextCompat.registerReceiver(this, receiver, filter, ContextCompat.RECEIVER_EXPORTED)
+        running = true
         Prefs.appendLog(applicationContext, "Сервис v${BuildConfig.VERSION_NAME} запущен, ожидаю данные от xDrip+")
         ExitReasons.logNew(applicationContext)
     }
@@ -134,6 +154,7 @@ class GlucoseForwardService : Service() {
 
     override fun onDestroy() {
         super.onDestroy()
+        running = false
         runCatching { unregisterReceiver(receiver) }
         Prefs.appendLog(applicationContext, "Сервис остановлен")
     }

@@ -71,6 +71,7 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         ReplyState.onChange = { runOnUiThread { refresh() } }
+        GlucoseForwardService.ensureRunning(this, "открыт экран приложения")
         // После выдачи доступа или перезапуска процесса система не всегда сразу подключает слушателя.
         if (hasListenerAccess() && !ReplyState.listenerConnected) {
             NotificationListenerService.requestRebind(ComponentName(this, ReplyListenerService::class.java))
