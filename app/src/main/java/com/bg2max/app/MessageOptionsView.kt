@@ -21,6 +21,8 @@ object MessageOptionsView {
         binding.checkboxPhoneBattery.isChecked = options.includePhoneBattery
         binding.checkboxProfile.isChecked = options.includeProfile
         binding.checkboxPumpStatus.isChecked = options.includePumpStatus
+        binding.checkboxTempBasal.isChecked = options.includeTempBasal
+        binding.checkboxTempBasalTime.isChecked = options.includeTempBasalTime
     }
 
     /**
@@ -32,7 +34,8 @@ object MessageOptionsView {
         val receivedAt = AapsStatus.lastReceivedAt(context)
         val anyChecked = listOf(
             binding.checkboxIob, binding.checkboxCob, binding.checkboxReservoir, binding.checkboxPumpBattery,
-            binding.checkboxPhoneBattery, binding.checkboxProfile, binding.checkboxPumpStatus
+            binding.checkboxPhoneBattery, binding.checkboxProfile, binding.checkboxPumpStatus,
+            binding.checkboxTempBasal, binding.checkboxTempBasalTime
         ).any { it.isChecked }
         binding.aapsOptions.visibility = if (receivedAt != 0L || anyChecked) View.VISIBLE else View.GONE
         binding.textAapsReceived.text = if (receivedAt == 0L) {
@@ -57,6 +60,8 @@ object MessageOptionsView {
         includePumpBattery = binding.checkboxPumpBattery.isChecked,
         includePhoneBattery = binding.checkboxPhoneBattery.isChecked,
         includeProfile = binding.checkboxProfile.isChecked,
-        includePumpStatus = binding.checkboxPumpStatus.isChecked
+        includePumpStatus = binding.checkboxPumpStatus.isChecked,
+        includeTempBasal = binding.checkboxTempBasal.isChecked,
+        includeTempBasalTime = binding.checkboxTempBasalTime.isChecked
     )
 }

@@ -131,6 +131,18 @@
         android:layout_height="wrap_content"
         android:text="Последняя связь с помпой и последний болюс" />
 
+    <CheckBox
+        android:id="@+id/checkboxTempBasal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Временная базальная скорость" />
+
+    <CheckBox
+        android:id="@+id/checkboxTempBasalTime"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Время временной базальной скорости (начало, длительность, остаток)" />
+
     </LinearLayout>
 
 </LinearLayout>

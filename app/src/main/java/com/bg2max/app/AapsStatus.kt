@@ -10,6 +10,9 @@ import android.os.Bundle
  *
  * Поля сверены с реальным пакетом 09.10.2026: iob, cob, pumpReservoir, pumpBattery,
  * phoneBattery, profile, pumpTimeStamp, pumpStatus («LastConn: 4 min ago\nLastBolus: 1,50U @ 18:03…»).
+ * Временный базал — 18.10.2026: baseBasal, tempBasalPercent, tempBasalStart, tempBasalDurationInMinutes
+ * (поля tempBasal* есть, только пока временный базал идёт; у помп с абсолютным TBR вместо
+ * процента AAPS шлёт tempBasalAbsolute).
  * Данных о сенсоре CGM (заряд, возраст) в пакете нет.
  */
 data class AapsStatus(
@@ -23,8 +26,22 @@ data class AapsStatus(
     /** Время последней связи AAPS с помпой. */
     val pumpTimeMs: Long?,
     /** Последний болюс в виде «1,50 Ед в 18:03» — из текста pumpStatus, если его удалось разобрать. */
-    val lastBolus: String?
+    val lastBolus: String?,
+    /** Базальная скорость по профилю (Ед/ч, с учётом процента профиля). */
+    val baseBasal: Double? = null,
+    /** Временный базал: процент от baseBasal или абсолютная скорость (Ед/ч) — что прислал AAPS. */
+    val tempBasalPercent: Int? = null,
+    val tempBasalAbsolute: Double? = null,
+    val tempBasalStartMs: Long? = null,
+    val tempBasalMinutes: Long? = null
 ) {
+    /** Временный базал идёт в момент [nowMs]: статус бывает старым до MAX_AGE_MS, TBR мог уже кончиться. */
+    fun tempBasalActive(nowMs: Long): Boolean {
+        val start = tempBasalStartMs ?: return false
+        val minutes = tempBasalMinutes ?: return false
+        return (tempBasalPercent != null || tempBasalAbsolute != null) && nowMs < start + minutes * 60_000L
+    }
+
     companion object {
         /** Статус старше этого в сообщение не идёт: AAPS мог остановиться, значения устарели. */
         const val MAX_AGE_MS = 10 * 60_000L
@@ -46,7 +63,12 @@ data class AapsStatus(
                 pumpTimeMs = number(extras, "pumpTimeStamp")?.toLong()?.takeIf { it > 0 },
                 lastBolus = pumpStatus?.let { LAST_BOLUS.find(it) }?.let { m ->
                     "${m.groupValues[1].replace('.', ',')} Ед в ${m.groupValues[2]}"
-                }
+                },
+                baseBasal = number(extras, "baseBasal")?.takeIf { it >= 0 },
+                tempBasalPercent = number(extras, "tempBasalPercent")?.toInt()?.takeIf { it >= 0 },
+                tempBasalAbsolute = number(extras, "tempBasalAbsolute")?.takeIf { it >= 0 },
+                tempBasalStartMs = number(extras, "tempBasalStart")?.toLong()?.takeIf { it > 0 },
+                tempBasalMinutes = number(extras, "tempBasalDurationInMinutes")?.toLong()?.takeIf { it > 0 }
             )
         }
 
@@ -72,6 +94,11 @@ data class AapsStatus(
                 s.profile?.let { putString("profile", it) }
                 s.pumpTimeMs?.let { putLong("pumpTimeMs", it) }
                 s.lastBolus?.let { putString("lastBolus", it) }
+                s.baseBasal?.let { putFloat("baseBasal", it.toFloat()) }
+                s.tempBasalPercent?.let { putInt("tempBasalPercent", it) }
+                s.tempBasalAbsolute?.let { putFloat("tempBasalAbsolute", it.toFloat()) }
+                s.tempBasalStartMs?.let { putLong("tempBasalStartMs", it) }
+                s.tempBasalMinutes?.let { putLong("tempBasalMinutes", it) }
             }.apply()
         }
 
@@ -85,6 +112,7 @@ data class AapsStatus(
             if (receivedAt == 0L || now - receivedAt > MAX_AGE_MS) return null
             fun float(key: String) = if (p.contains(key)) p.getFloat(key, 0f).toDouble() else null
             fun int(key: String) = if (p.contains(key)) p.getInt(key, 0) else null
+            fun long(key: String) = if (p.contains(key)) p.getLong(key, 0L) else null
             return AapsStatus(
                 receivedAt = receivedAt,
                 iob = float("iob"),
@@ -93,8 +121,13 @@ data class AapsStatus(
                 pumpBattery = int("pumpBattery"),
                 phoneBattery = int("phoneBattery"),
                 profile = p.getString("profile", null),
-                pumpTimeMs = if (p.contains("pumpTimeMs")) p.getLong("pumpTimeMs", 0L) else null,
-                lastBolus = p.getString("lastBolus", null)
+                pumpTimeMs = long("pumpTimeMs"),
+                lastBolus = p.getString("lastBolus", null),
+                baseBasal = float("baseBasal"),
+                tempBasalPercent = int("tempBasalPercent"),
+                tempBasalAbsolute = float("tempBasalAbsolute"),
+                tempBasalStartMs = long("tempBasalStartMs"),
+                tempBasalMinutes = long("tempBasalMinutes")
             )
         }
     }

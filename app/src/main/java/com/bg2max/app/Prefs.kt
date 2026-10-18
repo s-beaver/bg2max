@@ -30,6 +30,8 @@ object Prefs {
     private const val KEY_INCLUDE_PHONE_BATTERY = "include_phone_battery"
     private const val KEY_INCLUDE_PROFILE = "include_profile"
     private const val KEY_INCLUDE_PUMP_STATUS = "include_pump_status"
+    private const val KEY_INCLUDE_TEMP_BASAL = "include_temp_basal"
+    private const val KEY_INCLUDE_TEMP_BASAL_TIME = "include_temp_basal_time"
     private const val LOG_FILE = "bg2max.log"
     private const val LOG_FILE_MAX_BYTES = 1_000_000L
 
@@ -48,7 +50,9 @@ object Prefs {
         val includePumpBattery: Boolean = false,
         val includePhoneBattery: Boolean = false,
         val includeProfile: Boolean = false,
-        val includePumpStatus: Boolean = false
+        val includePumpStatus: Boolean = false,
+        val includeTempBasal: Boolean = false,
+        val includeTempBasalTime: Boolean = false
     )
 
     private fun prefs(context: Context) =
@@ -183,7 +187,9 @@ object Prefs {
             includePumpBattery = p.getBoolean(KEY_INCLUDE_PUMP_BATTERY, false),
             includePhoneBattery = p.getBoolean(KEY_INCLUDE_PHONE_BATTERY, false),
             includeProfile = p.getBoolean(KEY_INCLUDE_PROFILE, false),
-            includePumpStatus = p.getBoolean(KEY_INCLUDE_PUMP_STATUS, false)
+            includePumpStatus = p.getBoolean(KEY_INCLUDE_PUMP_STATUS, false),
+            includeTempBasal = p.getBoolean(KEY_INCLUDE_TEMP_BASAL, false),
+            includeTempBasalTime = p.getBoolean(KEY_INCLUDE_TEMP_BASAL_TIME, false)
         )
     }
 
@@ -202,6 +208,8 @@ object Prefs {
             .putBoolean(KEY_INCLUDE_PHONE_BATTERY, options.includePhoneBattery)
             .putBoolean(KEY_INCLUDE_PROFILE, options.includeProfile)
             .putBoolean(KEY_INCLUDE_PUMP_STATUS, options.includePumpStatus)
+            .putBoolean(KEY_INCLUDE_TEMP_BASAL, options.includeTempBasal)
+            .putBoolean(KEY_INCLUDE_TEMP_BASAL_TIME, options.includeTempBasalTime)
             .apply()
     }
 }

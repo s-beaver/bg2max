@@ -90,6 +90,27 @@ object GlucoseUtils {
             }
             a.lastBolus?.let { lines += "💧 Последний болюс: $it" }
         }
+        val tempBasalActive = a.tempBasalActive(nowMs)
+        if (options.includeTempBasal) {
+            val percent = a.tempBasalPercent
+            val absolute = a.tempBasalAbsolute
+            when {
+                // «нет» — только если AAPS вообще шлёт базал (baseBasal есть), иначе молчим.
+                !tempBasalActive -> if (a.baseBasal != null) lines += "📊 Временный базал: нет"
+                percent != null -> {
+                    val rate = a.baseBasal?.let { " (%.2f Ед/ч)".format(it * percent / 100) } ?: ""
+                    lines += "📊 Временный базал: $percent%$rate"
+                }
+                absolute != null -> lines += "📊 Временный базал: %.2f Ед/ч".format(absolute)
+            }
+        }
+        if (options.includeTempBasalTime && tempBasalActive) {
+            val start = a.tempBasalStartMs!!
+            val minutes = a.tempBasalMinutes!!
+            val startStr = android.text.format.DateFormat.format("HH:mm", start)
+            val left = ((start + minutes * 60_000L - nowMs + 59_999L) / 60_000L).coerceAtMost(minutes)
+            lines += "⏳ Временный базал: с $startStr на $minutes мин, осталось $left мин"
+        }
         return lines
     }
 }
