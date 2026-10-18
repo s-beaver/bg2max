@@ -31,3 +31,4 @@ BG2MAX не связан с разработчиками MAX, xDrip+ и AndroidA
 Copyright © 2026 Sergey Efremov
 Распространяется по лицензии GNU General Public License v3.0: https://www.gnu.org/licenses/gpl-3.0.html
 Исходный код: https://github.com/s-beaver/bg2max
+Политика конфиденциальности: https://s-beaver.github.io/bg2max/privacy.html

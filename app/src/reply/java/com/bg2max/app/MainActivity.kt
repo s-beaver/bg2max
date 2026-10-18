@@ -63,6 +63,8 @@ class MainActivity : AppCompatActivity() {
         binding.btnShareLog.setOnClickListener { shareLog() }
         binding.btnClearLog.setOnClickListener { confirmClearLog() }
         binding.btnDisclaimer.setOnClickListener { startActivity(DisclaimerActivity.viewIntent(this)) }
+        binding.btnPrivacy.setOnClickListener { startActivity(DataWipe.privacyIntent()) }
+        binding.btnWipe.setOnClickListener { confirmWipe() }
         binding.switchEnabled.setOnCheckedChangeListener { _, checked -> onToggleEnabled(checked) }
     }
 
@@ -267,6 +269,28 @@ class MainActivity : AppCompatActivity() {
             .setPositiveButton("Очистить") { _, _ ->
                 Prefs.clearLog(this)
                 refresh()
+            }
+            .setNegativeButton("Отмена", null)
+            .show()
+    }
+
+    private fun confirmWipe() {
+        AlertDialog.Builder(this)
+            .setTitle("Удалить все данные?")
+            .setMessage(
+                "Трансляция остановится. Будут удалены выбранный чат, настройки сообщения, журнал, " +
+                    "последнее показание и данные AndroidAPS. Вернуть их нельзя.\n\n" +
+                    "Доступ к уведомлениям — настройка Android: чтобы приложение перестало видеть " +
+                    "уведомления MAX, отключите его в настройках или удалите приложение."
+            )
+            .setPositiveButton("Удалить") { _, _ ->
+                DataWipe.wipeAll(this)
+                ReplyState.target = null
+                ReplyState.blockedBy = null
+                ReplyState.clearCandidates()
+                Toast.makeText(this, "Данные удалены", Toast.LENGTH_LONG).show()
+                // Согласие с отказом от ответственности тоже удалено — экран начнётся с него.
+                startActivity(Intent(this, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK))
             }
             .setNegativeButton("Отмена", null)
             .show()

@@ -55,6 +55,8 @@ class MainActivity : AppCompatActivity() {
         binding.btnSimulateReading.setOnClickListener { simulateReading() }
         binding.btnDetectChatId.setOnClickListener { detectChatId() }
         binding.btnDisclaimer.setOnClickListener { startActivity(DisclaimerActivity.viewIntent(this)) }
+        binding.btnPrivacy.setOnClickListener { startActivity(DataWipe.privacyIntent()) }
+        binding.btnWipe.setOnClickListener { confirmWipe() }
         binding.switchEnabled.setOnCheckedChangeListener { _, checked ->
             onToggleEnabled(checked)
         }
@@ -233,6 +235,22 @@ class MainActivity : AppCompatActivity() {
             .setItems(labels) { _, index ->
                 binding.inputChatId.setText(chats[index].chatId.toString())
             }
+            .show()
+    }
+
+    private fun confirmWipe() {
+        AlertDialog.Builder(this)
+            .setTitle("Удалить все данные?")
+            .setMessage(
+                "Трансляция остановится. Будут удалены токен бота, ID чата, настройки сообщения, журнал, " +
+                    "последнее показание и данные AndroidAPS. Вернуть их нельзя."
+            )
+            .setPositiveButton("Удалить") { _, _ ->
+                DataWipe.wipeAll(this)
+                Toast.makeText(this, "Данные удалены", Toast.LENGTH_LONG).show()
+                startActivity(Intent(this, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK))
+            }
+            .setNegativeButton("Отмена", null)
             .show()
     }
 }

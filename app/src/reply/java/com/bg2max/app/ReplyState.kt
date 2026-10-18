@@ -58,6 +58,10 @@ object ReplyState {
         }
     }
 
+    fun clearCandidates() {
+        synchronized(candidates) { candidates.clear() }
+    }
+
     /** Самые свежие сверху. */
     fun candidates(): List<ReplyButton> = synchronized(candidates) { candidates.values.reversed() }
 

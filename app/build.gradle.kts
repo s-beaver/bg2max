@@ -43,8 +43,8 @@ android {
             dimension = "transport"
             applicationIdSuffix = ".reply"
             // Своя нумерация, отдельно от bot.
-            versionCode = 4
-            versionName = "0.2.0"
+            versionCode = 5
+            versionName = "0.3.0"
         }
     }
 

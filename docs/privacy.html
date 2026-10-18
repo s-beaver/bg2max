@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BG2MAX — политика конфиденциальности</title>
+<meta name="description" content="Какие данные обрабатывает приложение BG2MAX, зачем, где и сколько они хранятся и как их удалить.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bitter:wght@600;700&family=Onest:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+  /* Та же палитра, что у инструкции (guide.html) */
+  :root {
+    --paper: #F3F5F4;
+    --ink: #1D2A26;
+    --text: #44524D;
+    --muted: #7A8782;
+    --accent: #1F6B5C;
+    --chip: #E6ECE9;
+    --card: #FFFFFF;
+    --rule: #DCE3E0;
+    --display: "Bitter", Georgia, serif;
+    --body: "Onest", "Segoe UI", Roboto, sans-serif;
+    --mono: "JetBrains Mono", Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #141B19; --ink: #E8EEEB; --text: #B9C4BF; --muted: #8A9792;
+      --accent: #5FB8A4; --chip: #23302C; --card: #1B2522; --rule: #2C3935;
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #141B19; --ink: #E8EEEB; --text: #B9C4BF; --muted: #8A9792;
+    --accent: #5FB8A4; --chip: #23302C; --card: #1B2522; --rule: #2C3935;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--paper); color: var(--text); font: 16px/1.65 var(--body); }
+  .sheet { max-width: 760px; margin: 0 auto; padding: 32px 16px 48px; }
+  h1, h2 { font-family: var(--display); color: var(--ink); text-wrap: balance; }
+  h1 { font-size: clamp(24px, 7vw, 34px); line-height: 1.15; margin: 6px 0 12px; overflow-wrap: anywhere; }
+  main { overflow-x: hidden; }
+  h2 { font-size: 20px; margin: 32px 0 8px; }
+  .eyebrow { font: 500 11px var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+  b, strong { color: var(--ink); font-weight: 600; }
+  a { color: var(--accent); }
+  code { font: 500 13px var(--mono); background: var(--chip); border: 1px solid var(--rule); border-radius: 5px; padding: 1px 5px; color: var(--ink); overflow-wrap: anywhere; }
+  .summary { background: var(--card); border: 1px solid var(--rule); border-left: 3px solid var(--accent); border-radius: 8px; padding: 14px 18px; margin: 20px 0; }
+  .summary p { margin: 6px 0; }
+  .table { overflow-x: auto; margin: 12px 0; }
+  table { width: 100%; min-width: 560px; border-collapse: collapse; background: var(--card); border: 1px solid var(--rule); border-radius: 8px; font-size: 14.5px; }
+  th, td { text-align: left; vertical-align: top; padding: 9px 12px; border-bottom: 1px solid var(--rule); }
+  th { color: var(--ink); font-weight: 600; background: var(--chip); }
+  tr:last-child td { border-bottom: 0; }
+  /* На телефоне строки таблицы — карточки, без прокрутки вбок */
+  @media (max-width: 600px) {
+    table, tbody, tr, td { display: block; min-width: 0; }
+    tr:first-child { display: none; }
+    tr { border-bottom: 1px solid var(--rule); padding: 8px 0; }
+    tr:last-child { border-bottom: 0; }
+    td { border: 0; padding: 3px 12px; }
+    td:nth-child(2)::before { content: "Откуда: "; color: var(--ink); font-weight: 600; }
+    td:nth-child(3)::before { content: "Зачем: "; color: var(--ink); font-weight: 600; }
+  }
+  ul, ol { padding-left: 22px; }
+  li { margin: 4px 0; }
+  .meta { color: var(--muted); font-size: 14px; }
+  footer { margin-top: 40px; padding-top: 16px; border-top: 1px solid var(--rule); color: var(--muted); font-size: 14px; }
+</style>
+</head>
+<body>
+<main class="sheet">
+  <div class="eyebrow">BG2MAX</div>
+  <h1>Политика конфиденциальности</h1>
+  <p class="meta">Редакция от 18 октября 2026 г. Действует для приложений BG2MAX (<code>com.bg2max.app.reply</code>) и BG2MAX Бот (<code>com.bg2max.app</code>).</p>
+
+  <div class="summary">
+    <p><b>Коротко.</b> BG2MAX пересылает показания глюкозы из xDrip+ (и данные AndroidAPS, если он есть) в один чат мессенджера MAX, который вы выбрали сами.</p>
+    <p>Все данные хранятся только на вашем телефоне. Разработчик их не получает: в приложении нет аналитики, рекламы, учётных записей и своих серверов. Удалить всё можно кнопкой <b>«Удалить все данные приложения»</b> на главном экране.</p>
+  </div>
+
+  <h2>1. Кто отвечает за приложение</h2>
+  <p>Разработчик — Сергей Ефремов, частное лицо. Приложение бесплатное, с открытым исходным кодом: <a href="https://github.com/s-beaver/bg2max">github.com/s-beaver/bg2max</a>. По вопросам о данных пишите на <a href="mailto:s_efremov@mail.ru">s_efremov@mail.ru</a>.</p>
+  <p>Разработчик не получает, не собирает и не хранит данные пользователей. Данные обрабатываются на телефоне пользователя и отправляются только туда, куда указал сам пользователь.</p>
+
+  <h2>2. Какие данные обрабатываются и зачем</h2>
+  <div class="table">
+  <table>
+    <tr><th>Данные</th><th>Откуда</th><th>Зачем</th></tr>
+    <tr><td><b>Показания глюкозы</b>: значение, тренд, изменение, время; шум сигнала, заряд и возраст сенсора, модель CGM</td><td>xDrip+ на этом телефоне</td><td>Составить сообщение и отправить его в выбранный чат. Последнее показание показывается на главном экране.</td></tr>
+    <tr><td><b>Данные AndroidAPS</b>: активный инсулин и углеводы, временный базал, резервуар и батарея помпы, батарея телефона, профиль, время связи с помпой и последний болюс</td><td>AndroidAPS на этом телефоне, если он установлен</td><td>Добавить в сообщение строки, которые вы отметили в настройках. Последний пакет показывается на экране для проверки.</td></tr>
+    <tr><td><b>Сведения об уведомлениях MAX</b> (только BG2MAX): имя чата, тип чата, номер уведомления и кнопка «Ответить». Текст сообщений не читается и не сохраняется.</td><td>Уведомления MAX, к которым вы дали доступ</td><td>Найти выбранный чат и отправить в него показание кнопкой «Ответить» от вашего аккаунта MAX.</td></tr>
+    <tr><td><b>Выбранный чат и настройки</b>: имя чата, какие строки включать в сообщение, включена ли трансляция</td><td>Вы сами</td><td>Работа приложения.</td></tr>
+    <tr><td><b>Токен бота и ID чата</b> (только BG2MAX Бот)</td><td>Вы сами</td><td>Отправка сообщения через MAX Bot API.</td></tr>
+    <tr><td><b>Журнал работы</b>: время событий, отправленные показания, имена чатов из уведомлений MAX, состояние экрана, сети и энергосбережения, причины остановки приложения; модель телефона и версия Android — при пересылке журнала</td><td>Само приложение</td><td>Диагностика: понять, почему показание не ушло.</td></tr>
+  </table>
+  </div>
+  <p>Данные о глюкозе и инсулине — сведения о здоровье. Приложение обрабатывает их только для того, чтобы переслать их в чат, который выбрали вы. Если это данные другого человека, например ребёнка, нужно его согласие или согласие его законного представителя.</p>
+
+  <h2>3. Кому передаются данные</h2>
+  <ul>
+    <li><b>Выбранному чату MAX.</b> Сообщение с показанием видят все участники чата. BG2MAX отправляет его через приложение MAX на этом телефоне, от вашего аккаунта. У самого BG2MAX нет разрешения на доступ в интернет. BG2MAX Бот отправляет сообщение через MAX Bot API (<code>platform-api2.max.ru</code>). Как MAX обрабатывает сообщения, описано в его собственной политике конфиденциальности.</li>
+    <li><b>Тому, кому вы перешлёте журнал.</b> Кнопка «Поделиться журналом» открывает стандартное окно Android «Поделиться». Журнал уходит только туда, куда вы его отправите сами.</li>
+  </ul>
+  <p>Разработчику и другим третьим лицам данные не передаются. Приложение не показывает рекламу и не использует сторонние SDK для аналитики, рекламы или сбора сбоев.</p>
+
+  <h2>4. Где и сколько хранятся данные</h2>
+  <ul>
+    <li>Всё хранится во внутренней памяти приложения на телефоне. Другие приложения к ней доступа не имеют.</li>
+    <li>Настройки и выбранный чат — пока вы их не удалите или не удалите приложение.</li>
+    <li>Последнее показание и последний пакет AndroidAPS — до прихода следующих: каждое новое значение заменяет предыдущее.</li>
+    <li>Журнал — не больше примерно 2 МБ. Когда он переполняется, старые записи удаляются. На экране видны 30 последних строк.</li>
+    <li>Копия журнала, созданная для отправки, лежит во временной папке приложения, которую Android может очистить сам.</li>
+    <li>Список чатов, из которых приходили уведомления MAX, хранится только в памяти до перезапуска приложения. Кнопка ответа выбранного чата хранится в тихом уведомлении «Связь с … сохранена», пока оно есть в шторке.</li>
+  </ul>
+
+  <h2>5. Как удалить данные</h2>
+  <ol>
+    <li>Откройте BG2MAX и нажмите внизу главного экрана <b>«Удалить все данные приложения»</b>. Трансляция остановится, будут удалены выбранный чат (или токен бота), настройки, журнал, последнее показание, данные AndroidAPS и уведомления приложения. После этого приложение откроется как после установки.</li>
+    <li>Доступ к уведомлениям — настройка Android, а не данные приложения. Чтобы BG2MAX перестал видеть уведомления MAX, отключите его в <b>Настройки → Уведомления → Доступ к уведомлениям</b>.</li>
+    <li>При удалении приложения Android стирает все его данные.</li>
+  </ol>
+  <p>Сообщения, которые уже ушли в чат MAX, хранятся в MAX. Удалить их можно средствами MAX.</p>
+
+  <h2>6. Разрешения приложения</h2>
+  <ul>
+    <li><b>Доступ к уведомлениям</b> (BG2MAX) — найти уведомление выбранного чата MAX и ответить в него.</li>
+    <li><b>Получение данных xDrip+</b> — принимать показания глюкозы.</li>
+    <li><b>Уведомления и работа в фоне</b> — постоянное уведомление о состоянии трансляции, работа при выключенном экране, запуск после перезагрузки.</li>
+    <li><b>Состояние сети</b> — записать в журнал, была ли связь, когда показание не ушло.</li>
+    <li><b>Интернет</b> — только у BG2MAX Бот, для отправки через MAX Bot API.</li>
+  </ul>
+
+  <h2>7. Дети</h2>
+  <p>BG2MAX часто ставят на телефон ребёнка с диабетом, чтобы родители видели его показания. Устанавливает и настраивает приложение взрослый: он выбирает, в какой чат и каким людям уходят данные. Разработчик данные ребёнка не получает.</p>
+
+  <h2>8. Изменения политики</h2>
+  <p>Новая редакция публикуется на этой странице с новой датой. История изменений видна в репозитории проекта: <a href="https://github.com/s-beaver/bg2max/commits/main/docs/privacy.html">github.com/s-beaver/bg2max</a>.</p>
+
+  <footer>BG2MAX не является медицинским изделием. © 2026 Сергей Ефремов · <a href="mailto:s_efremov@mail.ru">s_efremov@mail.ru</a> · <a href="./">О приложении</a></footer>
+</main>
+</body>
+</html>
