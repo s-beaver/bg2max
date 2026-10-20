@@ -2,6 +2,7 @@ package com.bg2max.app
 
 import android.content.Context
 import android.view.View
+import android.widget.EditText
 import com.bg2max.app.databinding.ViewMessageOptionsBinding
 
 /** Галочки «Что включать в сообщение» (view_message_options.xml) ↔ Prefs.MessageOptions. */
@@ -23,6 +24,10 @@ object MessageOptionsView {
         binding.checkboxPumpStatus.isChecked = options.includePumpStatus
         binding.checkboxTempBasal.isChecked = options.includeTempBasal
         binding.checkboxTempBasalTime.isChecked = options.includeTempBasalTime
+        binding.inputBatteryBelow.setText(options.batteryBelow?.toString().orEmpty())
+        binding.inputReservoirBelow.setText(options.reservoirBelow?.toString().orEmpty())
+        binding.inputPumpBatteryBelow.setText(options.pumpBatteryBelow?.toString().orEmpty())
+        binding.inputPhoneBatteryBelow.setText(options.phoneBatteryBelow?.toString().orEmpty())
     }
 
     /**
@@ -62,6 +67,14 @@ object MessageOptionsView {
         includeProfile = binding.checkboxProfile.isChecked,
         includePumpStatus = binding.checkboxPumpStatus.isChecked,
         includeTempBasal = binding.checkboxTempBasal.isChecked,
-        includeTempBasalTime = binding.checkboxTempBasalTime.isChecked
+        includeTempBasalTime = binding.checkboxTempBasalTime.isChecked,
+        batteryBelow = threshold(binding.inputBatteryBelow),
+        reservoirBelow = threshold(binding.inputReservoirBelow),
+        pumpBatteryBelow = threshold(binding.inputPumpBatteryBelow),
+        phoneBatteryBelow = threshold(binding.inputPhoneBatteryBelow)
     )
+
+    /** Пустое поле или 0 — порога нет, строка выводится всегда. */
+    private fun threshold(input: EditText): Int? =
+        input.text?.toString()?.trim()?.toIntOrNull()?.takeIf { it > 0 }
 }

@@ -32,6 +32,12 @@ object Prefs {
     private const val KEY_INCLUDE_PUMP_STATUS = "include_pump_status"
     private const val KEY_INCLUDE_TEMP_BASAL = "include_temp_basal"
     private const val KEY_INCLUDE_TEMP_BASAL_TIME = "include_temp_basal_time"
+    private const val KEY_BATTERY_BELOW = "battery_below"
+    private const val KEY_RESERVOIR_BELOW = "reservoir_below"
+    private const val KEY_PUMP_BATTERY_BELOW = "pump_battery_below"
+    private const val KEY_PHONE_BATTERY_BELOW = "phone_battery_below"
+    /** Порог «если <» до первого сохранения: 30 % для зарядов, 30 Ед для резервуара. */
+    private const val DEFAULT_BELOW = 30
     private const val LOG_FILE = "bg2max.log"
     private const val LOG_FILE_MAX_BYTES = 1_000_000L
 
@@ -52,7 +58,12 @@ object Prefs {
         val includeProfile: Boolean = false,
         val includePumpStatus: Boolean = false,
         val includeTempBasal: Boolean = false,
-        val includeTempBasalTime: Boolean = false
+        val includeTempBasalTime: Boolean = false,
+        // Пороги «только если ниже»: null — строка выводится всегда.
+        val batteryBelow: Int? = null,
+        val reservoirBelow: Int? = null,
+        val pumpBatteryBelow: Int? = null,
+        val phoneBatteryBelow: Int? = null
     )
 
     private fun prefs(context: Context) =
@@ -189,7 +200,11 @@ object Prefs {
             includeProfile = p.getBoolean(KEY_INCLUDE_PROFILE, false),
             includePumpStatus = p.getBoolean(KEY_INCLUDE_PUMP_STATUS, false),
             includeTempBasal = p.getBoolean(KEY_INCLUDE_TEMP_BASAL, false),
-            includeTempBasalTime = p.getBoolean(KEY_INCLUDE_TEMP_BASAL_TIME, false)
+            includeTempBasalTime = p.getBoolean(KEY_INCLUDE_TEMP_BASAL_TIME, false),
+            batteryBelow = p.getInt(KEY_BATTERY_BELOW, DEFAULT_BELOW).takeIf { it > 0 },
+            reservoirBelow = p.getInt(KEY_RESERVOIR_BELOW, DEFAULT_BELOW).takeIf { it > 0 },
+            pumpBatteryBelow = p.getInt(KEY_PUMP_BATTERY_BELOW, DEFAULT_BELOW).takeIf { it > 0 },
+            phoneBatteryBelow = p.getInt(KEY_PHONE_BATTERY_BELOW, DEFAULT_BELOW).takeIf { it > 0 }
         )
     }
 
@@ -210,6 +225,10 @@ object Prefs {
             .putBoolean(KEY_INCLUDE_PUMP_STATUS, options.includePumpStatus)
             .putBoolean(KEY_INCLUDE_TEMP_BASAL, options.includeTempBasal)
             .putBoolean(KEY_INCLUDE_TEMP_BASAL_TIME, options.includeTempBasalTime)
+            .putInt(KEY_BATTERY_BELOW, options.batteryBelow ?: 0)
+            .putInt(KEY_RESERVOIR_BELOW, options.reservoirBelow ?: 0)
+            .putInt(KEY_PUMP_BATTERY_BELOW, options.pumpBatteryBelow ?: 0)
+            .putInt(KEY_PHONE_BATTERY_BELOW, options.phoneBatteryBelow ?: 0)
             .apply()
     }
 }

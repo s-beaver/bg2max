@@ -54,7 +54,7 @@ object GlucoseUtils {
         }
         if (options.includeBattery) {
             // -1 — xDrip+ не знает заряд (обычно при источнике «Other App»).
-            reading.sensorBatteryPercent?.takeIf { it in 0..100 }?.let { battery ->
+            reading.sensorBatteryPercent?.takeIf { it in 0..100 && isLow(it, options.batteryBelow) }?.let { battery ->
                 lines += "🔋 Батарея сенсора: $battery%"
             }
         }
@@ -75,13 +75,19 @@ object GlucoseUtils {
         return lines.joinToString("\n")
     }
 
+    /** Порог «только если ниже»: без порога ([below] == null) строка выводится всегда. */
+    private fun isLow(value: Number, below: Int?): Boolean = below == null || value.toDouble() < below
+
     private fun aapsLines(a: AapsStatus, options: Prefs.MessageOptions, nowMs: Long): List<String> {
         val lines = mutableListOf<String>()
         if (options.includeIob) a.iob?.let { lines += "💉 Активный инсулин: %.2f Ед".format(it) }
         if (options.includeCob) a.cob?.let { lines += "🍞 Активные углеводы: %.0f г".format(it) }
-        if (options.includeReservoir) a.reservoir?.let { lines += "🧪 Резервуар помпы: %.0f Ед".format(it) }
-        if (options.includePumpBattery) a.pumpBattery?.let { lines += "🔋 Батарея помпы: $it%" }
-        if (options.includePhoneBattery) a.phoneBattery?.let { lines += "📱 Батарея телефона: $it%" }
+        if (options.includeReservoir) a.reservoir?.takeIf { isLow(it, options.reservoirBelow) }
+            ?.let { lines += "🧪 Резервуар помпы: %.0f Ед".format(it) }
+        if (options.includePumpBattery) a.pumpBattery?.takeIf { isLow(it, options.pumpBatteryBelow) }
+            ?.let { lines += "🔋 Батарея помпы: $it%" }
+        if (options.includePhoneBattery) a.phoneBattery?.takeIf { isLow(it, options.phoneBatteryBelow) }
+            ?.let { lines += "📱 Батарея телефона: $it%" }
         if (options.includeProfile) a.profile?.let { lines += "⚙️ Профиль: $it" }
         if (options.includePumpStatus) {
             a.pumpTimeMs?.let { pumpTime ->

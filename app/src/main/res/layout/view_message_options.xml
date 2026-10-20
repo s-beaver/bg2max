@@ -17,7 +17,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="2dp"
         android:layout_marginBottom="4dp"
-        android:text="Значение глюкозы, стрелка тренда и время отправляются всегда"
+        android:text="Значение глюкозы, стрелка тренда и время отправляются всегда. Заряд и остаток инсулина можно присылать, только когда они ниже порога («если &lt;»); пустое поле — всегда"
         android:textSize="12sp"
         android:textColor="#666666" />
 
@@ -39,11 +39,42 @@
         android:layout_height="wrap_content"
         android:text="Предупреждение о шуме сигнала" />
 
-    <CheckBox
-        android:id="@+id/checkboxBattery"
+    <!-- Пустое поле — строка всегда; число — только когда значение ниже него. -->
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Заряд батареи сенсора" />
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <CheckBox
+            android:id="@+id/checkboxBattery"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Заряд батареи сенсора" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="если &lt;"
+            android:textSize="12sp" />
+
+        <EditText
+            android:id="@+id/inputBatteryBelow"
+            android:layout_width="56dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:hint="—"
+            android:importantForAutofill="no"
+            android:inputType="number"
+            android:maxLength="3" />
+
+        <TextView
+            android:layout_width="24dp"
+            android:layout_height="wrap_content"
+            android:text="%"
+            android:textSize="12sp" />
+    </LinearLayout>
 
     <CheckBox
         android:id="@+id/checkboxSource"
@@ -101,23 +132,116 @@
         android:layout_height="wrap_content"
         android:text="Активные углеводы (COB)" />
 
-    <CheckBox
-        android:id="@+id/checkboxReservoir"
+    <!-- Пустое поле — строка всегда; число — только когда значение ниже него. -->
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Остаток инсулина в помпе" />
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
 
-    <CheckBox
-        android:id="@+id/checkboxPumpBattery"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Заряд батареи помпы" />
+        <CheckBox
+            android:id="@+id/checkboxReservoir"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Остаток инсулина в помпе" />
 
-    <CheckBox
-        android:id="@+id/checkboxPhoneBattery"
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="если &lt;"
+            android:textSize="12sp" />
+
+        <EditText
+            android:id="@+id/inputReservoirBelow"
+            android:layout_width="56dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:hint="—"
+            android:importantForAutofill="no"
+            android:inputType="number"
+            android:maxLength="3" />
+
+        <TextView
+            android:layout_width="24dp"
+            android:layout_height="wrap_content"
+            android:text="Ед"
+            android:textSize="12sp" />
+    </LinearLayout>
+
+    <!-- Пустое поле — строка всегда; число — только когда значение ниже него. -->
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Заряд батареи телефона" />
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <CheckBox
+            android:id="@+id/checkboxPumpBattery"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Заряд батареи помпы" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="если &lt;"
+            android:textSize="12sp" />
+
+        <EditText
+            android:id="@+id/inputPumpBatteryBelow"
+            android:layout_width="56dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:hint="—"
+            android:importantForAutofill="no"
+            android:inputType="number"
+            android:maxLength="3" />
+
+        <TextView
+            android:layout_width="24dp"
+            android:layout_height="wrap_content"
+            android:text="%"
+            android:textSize="12sp" />
+    </LinearLayout>
+
+    <!-- Пустое поле — строка всегда; число — только когда значение ниже него. -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <CheckBox
+            android:id="@+id/checkboxPhoneBattery"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Заряд батареи телефона" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="если &lt;"
+            android:textSize="12sp" />
+
+        <EditText
+            android:id="@+id/inputPhoneBatteryBelow"
+            android:layout_width="56dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:hint="—"
+            android:importantForAutofill="no"
+            android:inputType="number"
+            android:maxLength="3" />
+
+        <TextView
+            android:layout_width="24dp"
+            android:layout_height="wrap_content"
+            android:text="%"
+            android:textSize="12sp" />
+    </LinearLayout>
 
     <CheckBox
         android:id="@+id/checkboxProfile"
