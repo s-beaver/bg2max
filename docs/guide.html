@@ -65,7 +65,7 @@
   .step { display: grid; grid-template-columns: 64px 1fr; gap: 0 16px; margin-top: 34px; break-inside: auto; }
   .step .n { font: 700 28px/1 var(--display); color: var(--accent); padding-top: 2px; }
   .step .body { min-width: 0; }
-  .step .body > h2 { margin-bottom: 10px; }
+  .step .body > h2 { margin-bottom: 10px; break-after: avoid; }
   .step p { margin: 8px 0; }
   ol { padding-left: 22px; margin: 8px 0; }
   ol li { margin: 6px 0; }
@@ -243,6 +243,9 @@
     <pre class="code">info.nightscout.androidaps com.bg2max.app.reply</pre>
     <p>После ввода проверьте, что клавиатура не сделала первую букву заглавной.</p>
   </div>
+  <div class="note"><span class="eyebrow">Включите рассылку данных в AndroidAPS</span>
+    <p>В AAPS откройте <b>Конфигуратор → Синхронизация</b> и включите <b>Data Broadcaster</b> (в старых версиях — <b>Samsung Tizen</b>). Без него данные AAPS в BG2MAX не приходят: в сообщении будет только глюкоза из xDrip+.</p>
+  </div>
   <div class="note"><span class="eyebrow">Не оставляйте поле пустым</span>
     <p>С пустым полем xDrip+ рассылает показания всем приложениям на телефоне. Если какое-то из них умеет пересылать глюкозу обратно в xDrip+, на графике появятся дубли.</p>
   </div>
@@ -298,7 +301,7 @@
   </table>
   <p>Заряд и остаток инсулина, пока их хватает, смотреть незачем. Поле «если &lt;» справа от галочки задаёт порог: строка придёт, только когда значение ниже него. По умолчанию — 30 % для зарядов и 30 Ед для резервуара. Очистите поле, чтобы строка приходила всегда.</p>
   <div class="note"><span class="eyebrow">Блок «Из AndroidAPS» не виден?</span>
-    <p>Он появляется, когда от AAPS придут первые данные. В AAPS откройте <b>Конфигуратор → Синхронизация</b> и включите модуль <b>Samsung Tizen</b> (в новых версиях — <b>Data Broadcaster</b>). Под заголовком блока видно время последних данных. Если они старше 10 минут, строки AAPS в сообщение не добавляются, чтобы не отправить устаревшие цифры.</p>
+    <p>Он появляется, когда от AAPS придут первые данные. В AAPS откройте <b>Конфигуратор → Синхронизация</b> и включите модуль <b>Data Broadcaster</b> (в старых версиях — <b>Samsung Tizen</b>). Под заголовком блока видно время последних данных. Если они старше 10 минут, строки AAPS в сообщение не добавляются, чтобы не отправить устаревшие цифры.</p>
   </div>
   <p>Нажмите <b>«Сохранить настройки сообщения»</b>.</p>
 </div></section>
